@@ -3,14 +3,15 @@ import "./Stars.css";
 import { useTelegram } from "../../../../context/TelegramContext";
 
 const StarsModal = ({ onClose }) => {
-  // ✅ FAQAT BIR MARTA OLINADI
   const { createOrder, apiUser } = useTelegram();
 
   const [username, setUsername] = useState("");
   const [amount, setAmount] = useState("");
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(true);
+
   const [sending, setSending] = useState(false);
+  const [success, setSuccess] = useState(false); // ✅ NEW
 
   // 🔥 PRICE settings dan
   useEffect(() => {
@@ -25,25 +26,16 @@ const StarsModal = ({ onClose }) => {
   }, []);
 
   const totalPrice = amount && price ? amount * price : 0;
+  const balance = loading ? "..." : apiUser?.balance || "0";
 
   const handleSubmit = async () => {
-    if (!username.trim()) {
-      alert("Username kiriting");
-      return;
-    }
+    if (!username.trim()) return alert("Username kiriting");
+    if (amount < 50 || amount > 500000)
+      return alert("Stars 50 — 500000 oralig‘ida bo‘lishi kerak");
 
-    if (amount < 50 || amount > 500000) {
-      alert("Stars 50 -- 500000 oralig‘ida bo‘lishi kerak");
-      return;
-    }
-
-    // 🔥 BALANCE TEKSHIRISH
-    const balance = Number(apiUser?.balance || 0);
-
-    if (balance < totalPrice) {
-      alert("❌ Sotib olish uchun mablag‘ yetarli emas");
-      return;
-    }
+    const userBalance = Number(apiUser?.balance || 0);
+    if (userBalance < totalPrice)
+      return alert("❌ Mablag‘ yetarli emas");
 
     setSending(true);
 
@@ -54,54 +46,83 @@ const StarsModal = ({ onClose }) => {
       overall: totalPrice,
     });
 
-    setSending(false);
-
     if (result.ok) {
-      alert("✅ Buyurtma qabul qilindi");
-      onClose();
+      setTimeout(() => {
+        setSending(false);
+        setSuccess(true); // ✅ SUCCESS
+        setTimeout(() => {
+          onClose();
+        }, 1800);
+      }, 1200);
     } else {
+      setSending(false);
       alert("❌ Xatolik: " + result.message);
     }
   };
-  const balance = loading ? "..." : apiUser?.balance || "0";
 
   return (
     <div className="stars-modal-overlay" onClick={onClose}>
       <div className="stars-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="stars-close-btn" onClick={onClose}>✕</button>
 
-        <h3>⭐ Stars Xaridi</h3>
-        <strong>Hisobingiz : {balance} </strong>
+        {/* ❌ CLOSE */}
+        {!sending && !success && (
+          <button className="stars-close-btn" onClick={onClose}>✕</button>
+        )}
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-
-        <input
-          type="number"
-          min={50}
-          max={500000}
-          placeholder="Stars soni"
-          value={amount}
-          onChange={(e) => setAmount(Number(e.target.value))}
-        />
-
-        {!loading && amount > 0 && (
-          <div className="stars-price-box">
-            <span>1 ⭐ = {price.toLocaleString()} UZS</span>
-            <strong>{totalPrice.toLocaleString()} UZS</strong>
+        {/* 🔄 LOADING */}
+        {sending && (
+          <div className="stars-loader">
+            <div className="spinner"></div>
+            <p>Yuborilmoqda...</p>
           </div>
         )}
 
-        <button
-          onClick={handleSubmit}
-          disabled={sending || Number(apiUser?.balance || 0) < totalPrice}
-        >
-          {sending ? "Yuborilmoqda..." : "Sotib olish"}
-        </button>
+        {/* ✅ SUCCESS */}
+        {success && (
+          <div className="stars-success">
+            <div className="checkmark">✓</div>
+            <h3>Muvaffaqiyatli!</h3>
+            <p>Stars muvaffaqiyatli sotib olindi</p>
+          </div>
+        )}
+
+        {/* 🧾 FORM */}
+        {!sending && !success && (
+          <>
+            <h3>⭐ Stars Xaridi</h3>
+            <strong>Hisobingiz: {balance} UZS</strong>
+
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+
+            <input
+              type="number"
+              min={50}
+              max={500000}
+              placeholder="Stars soni"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+            />
+
+            {!loading && amount > 0 && (
+              <div className="stars-price-box">
+                <span>1 ⭐ = {price.toLocaleString()} UZS</span>
+                <strong>{totalPrice.toLocaleString()} UZS</strong>
+              </div>
+            )}
+
+            <button
+              onClick={handleSubmit}
+              disabled={Number(apiUser?.balance || 0) < totalPrice}
+            >
+              Sotib olish
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

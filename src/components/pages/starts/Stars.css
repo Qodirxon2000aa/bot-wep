@@ -139,3 +139,60 @@
   margin-top: 4px;
   font-weight: bold;
 }
+
+
+
+/* 🔄 LOADER */
+.stars-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #eee;
+  border-top: 5px solid gold;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 14px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ✅ SUCCESS */
+.stars-success {
+  text-align: center;
+  padding: 40px 20px;
+  animation: successFade 0.5s ease;
+}
+
+.checkmark {
+  width: 70px;
+  height: 70px;
+  background: #4caf50;
+  color: #fff;
+  font-size: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.5); opacity: 0 }
+  100% { transform: scale(1); opacity: 1 }
+}
+
+@keyframes successFade {
+  from { opacity: 0; transform: translateY(10px) }
+  to { opacity: 1; transform: translateY(0) }
+}
