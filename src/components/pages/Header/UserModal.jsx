@@ -4,7 +4,7 @@ import { useTelegram } from "../../../../context/TelegramContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
-  const { user, apiUser, loading: telegramLoading } = useTelegram();
+  const { user, apiUser, loading: telegramLoading, refreshUser } = useTelegram();
 
   // Profile rasmi
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
@@ -17,9 +17,8 @@ const UserModal = ({ onClose }) => {
   // Balance ni modal ochilganda fetch qilish
   useEffect(() => {
     console.log("🚀 UserModal useEffect started");
-    console.log("📋 user object:", JSON.stringify(user, null, 2));
-    console.log("📋 user.id:", user?.id);
-    console.log("📋 user.isTelegram:", user?.isTelegram);
+    console.log("📋 user:", user);
+    console.log("📋 apiUser:", apiUser);
 
     if (!user?.id) {
       console.warn("⚠️ user.id yo'q!");
@@ -31,54 +30,74 @@ const UserModal = ({ onClose }) => {
     setBalanceLoading(true);
     setFetchError(null);
 
-    const userId = user.id;
-    
-    // ❗ MUHIM: Agar DEV mode bo'lsa, real Telegram ID ishlatish
+    // 🔥 MUHIM: DEV mode bo'lsa real Telegram ID ishlatamiz
     const actualUserId = user.isTelegram === false 
-      ? "7887859754"  // 🔥 Bu sizning real Telegram ID'ingiz (PHP da mavjud)
-      : userId;
+      ? "7887859754"  // Real Telegram ID
+      : user.id;
 
     const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${actualUserId}`;
 
     console.log("📡 Fetch URL:", fetchUrl);
-    console.log("🆔 Actual User ID:", actualUserId);
+    console.log("🆔 User ID:", actualUserId);
+    console.log("🌐 Is Telegram:", user.isTelegram);
 
-    fetch(fetchUrl)
+    // Fetch with better error handling
+    fetch(fetchUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      mode: 'cors', // CORS explicit
+    })
       .then((res) => {
-        console.log("📥 HTTP Status:", res.status, res.statusText);
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        return res.json();
+        console.log("📥 Response:", {
+          status: res.status,
+          statusText: res.statusText,
+          ok: res.ok,
+          headers: Array.from(res.headers.entries())
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res.text(); // First get as text
       })
-      .then((response) => {
-        console.log("✅ Full PHP Response:", JSON.stringify(response, null, 2));
+      .then((text) => {
+        console.log("📄 Raw Response Text:", text);
+        
+        try {
+          const response = JSON.parse(text);
+          console.log("✅ Parsed JSON:", response);
 
-        if (response.ok && response.data) {
-          console.log("✅ response.ok = true");
-          console.log("💾 response.data:", response.data);
-          console.log("💰 response.data.balance:", response.data.balance);
-          console.log("💰 typeof balance:", typeof response.data.balance);
-
-          const userBalance = response.data.balance;
-          
-          if (userBalance !== undefined && userBalance !== null) {
-            console.log("✅ Balance set qilindi:", userBalance);
+          if (response.ok && response.data && response.data.balance !== undefined) {
+            const userBalance = response.data.balance;
+            console.log("💰 Balance found:", userBalance, typeof userBalance);
             setBalance(userBalance);
+            setFetchError(null);
           } else {
-            console.warn("⚠️ Balance undefined/null, 0 qo'yildi");
+            console.warn("⚠️ Invalid response structure");
+            setFetchError("Invalid response");
             setBalance("0");
           }
-        } else {
-          console.warn("⚠️ response.ok !== true yoki data yo'q");
-          console.log("Response:", response);
-          setFetchError("Server javobida xatolik");
+        } catch (parseError) {
+          console.error("❌ JSON Parse Error:", parseError);
+          console.error("Raw text was:", text);
+          setFetchError("JSON parse error");
           setBalance("0");
         }
       })
       .catch((err) => {
         console.error("❌ Fetch Error:", err);
+        console.error("❌ Error name:", err.name);
         console.error("❌ Error message:", err.message);
-        console.error("❌ Error stack:", err.stack);
-        setFetchError(err.message);
+        
+        // More specific error messages
+        if (err.message === "Failed to fetch") {
+          setFetchError("CORS yoki network xatosi");
+        } else {
+          setFetchError(err.message);
+        }
+        
         setBalance("0");
       })
       .finally(() => {
@@ -94,6 +113,17 @@ const UserModal = ({ onClose }) => {
     return balStr.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
 
+  // Manual refresh function
+  const handleRefresh = () => {
+    console.log("🔄 Manual refresh triggered");
+    if (refreshUser) {
+      refreshUser();
+    }
+    // Re-trigger useEffect by clearing balance
+    setBalance(null);
+    setBalanceLoading(true);
+  };
+
   // Demo history
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
@@ -104,11 +134,6 @@ const UserModal = ({ onClose }) => {
   const toggleRow = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
   };
-
-  console.log("🎨 Final Render State:");
-  console.log("   balance:", balance);
-  console.log("   balanceLoading:", balanceLoading);
-  console.log("   fetchError:", fetchError);
 
   return (
     <div className="user-modal-overlay" onClick={onClose}>
@@ -144,20 +169,24 @@ const UserModal = ({ onClose }) => {
               <div style={{ 
                 marginTop: "8px", 
                 padding: "8px", 
-                backgroundColor: "#fff3cd",
-                border: "1px solid #ffc107",
+                backgroundColor: fetchError ? "#ffebee" : "#fff3cd",
+                border: `1px solid ${fetchError ? "#f44336" : "#ffc107"}`,
                 borderRadius: "4px",
                 fontSize: "11px",
                 fontFamily: "monospace"
               }}>
-                <div><strong>DEBUG:</strong></div>
-                <div>• Loading: {balanceLoading ? "⏳ true" : "✅ false"}</div>
-                <div>• State: {balance === null ? "null" : `"${balance}"`}</div>
-                <div>• Type: {balance === null ? "null" : typeof balance}</div>
-                <div>• Context: {apiUser?.balance || "N/A"}</div>
+                <div><strong>🔍 DEBUG INFO:</strong></div>
+                <div>• Loading: {balanceLoading ? "⏳" : "✅"}</div>
+                <div>• Balance: {balance === null ? "null" : `"${balance}"`}</div>
+                <div>• Type: {balance === null ? "-" : typeof balance}</div>
                 <div>• User ID: {user?.id}</div>
-                <div>• Is Telegram: {user?.isTelegram ? "Yes" : "No"}</div>
-                {fetchError && <div style={{color: "red"}}>• Error: {fetchError}</div>}
+                <div>• Telegram: {user?.isTelegram ? "Yes ✅" : "No (DEV) 🔧"}</div>
+                <div>• API Balance: {apiUser?.balance || "N/A"}</div>
+                {fetchError && (
+                  <div style={{color: "#d32f2f", fontWeight: "bold", marginTop: "4px"}}>
+                    ⚠️ {fetchError}
+                  </div>
+                )}
               </div>
 
               {/* BALANCE DISPLAY */}
@@ -165,20 +194,56 @@ const UserModal = ({ onClose }) => {
                 marginTop: "12px", 
                 fontWeight: "bold", 
                 fontSize: "20px", 
-                color: balance && balance !== "0" ? "#4CAF50" : "#666",
+                color: fetchError ? "#f44336" : (balance && balance !== "0" ? "#4CAF50" : "#666"),
                 padding: "12px",
-                backgroundColor: balance && balance !== "0" ? "#e8f5e9" : "#f5f5f5",
+                backgroundColor: fetchError ? "#ffebee" : (balance && balance !== "0" ? "#e8f5e9" : "#f5f5f5"),
                 borderRadius: "8px",
-                textAlign: "center"
+                textAlign: "center",
+                border: fetchError ? "2px solid #f44336" : "none"
               }}>
                 💰 Balance: {
                   balanceLoading 
                     ? "⏳ Yuklanmoqda..." 
-                    : balance !== null 
-                      ? `${formatBalance(balance)} UZS` 
-                      : "❌ Xato"
+                    : fetchError
+                      ? "❌ Xato"
+                      : balance !== null 
+                        ? `${formatBalance(balance)} UZS` 
+                        : "⚠️ Ma'lumot yo'q"
                 }
               </div>
+
+              {/* REFRESH BUTTON */}
+              {fetchError && (
+                <button 
+                  onClick={handleRefresh}
+                  style={{
+                    marginTop: "8px",
+                    width: "100%",
+                    padding: "8px",
+                    backgroundColor: "#2196F3",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  🔄 Qayta urinish
+                </button>
+              )}
+
+              {/* WORKAROUND: Agar fetch ishlamasa, Context dan ko'rsat */}
+              {fetchError && apiUser?.balance && (
+                <div style={{
+                  marginTop: "8px",
+                  padding: "8px",
+                  backgroundColor: "#e3f2fd",
+                  borderRadius: "4px",
+                  fontSize: "12px"
+                }}>
+                  ℹ️ Context balance: <strong>{formatBalance(apiUser.balance)} UZS</strong>
+                </div>
+              )}
             </div>
           </div>
         </div>
