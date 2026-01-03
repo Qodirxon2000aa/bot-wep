@@ -4,20 +4,31 @@ import "./UserModal.css";
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [user, setUser] = useState({
+    id: "",
     first_name: "",
     last_name: "",
     username: ""
   });
 
   useEffect(() => {
-    if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-      const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+    if (window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.expand();
 
-      setUser({
-        first_name: tgUser.first_name || "",
-        last_name: tgUser.last_name || "",
-        username: tgUser.username ? `@${tgUser.username}` : ""
-      });
+      if (tg.initDataUnsafe?.user) {
+        const tgUser = tg.initDataUnsafe.user;
+
+        setUser({
+          id: tgUser.id || "",
+          first_name: tgUser.first_name || "",
+          last_name: tgUser.last_name || "",
+          username: tgUser.username ? `@${tgUser.username}` : ""
+        });
+
+        console.log("TG USER:", tgUser);
+      } else {
+        console.log("Telegram user topilmadi");
+      }
     }
   }, []);
 
@@ -42,6 +53,7 @@ const UserModal = ({ onClose }) => {
             <div className="user-modal-info">
               <h3>{user.first_name} {user.last_name}</h3>
               <p>{user.username}</p>
+              <small>ID: {user.id}</small>
             </div>
           </div>
         </div>
@@ -50,27 +62,10 @@ const UserModal = ({ onClose }) => {
         <div className="user-modal-body">
           <h2 className="user-modal-title">HISTORY</h2>
 
-          <div className="user-table-header">
-            <div className="user-th-action">
-              <span className="user-dot"></span>
-              ACTION TYPE
-            </div>
-            <div className="user-th-amount">AMOUNT</div>
-            <div className="user-th-date">DATE</div>
-            <div className="user-th-expand"></div>
-          </div>
-
           {historyData.map((item) => (
             <div key={item.id} className="user-row-wrapper">
-
-              <div
-                className="user-table-row"
-                onClick={() => toggleRow(item.id)}
-              >
-                <div className="user-action-cell">
-                  <span className="user-dot"></span>
-                  {item.type}
-                </div>
+              <div className="user-table-row" onClick={() => toggleRow(item.id)}>
+                <div className="user-action-cell">{item.type}</div>
                 <div className="user-amount-cell">{item.amount}</div>
                 <div className="user-date-cell">{item.date}</div>
                 <div className="user-expand-icon">
@@ -79,13 +74,12 @@ const UserModal = ({ onClose }) => {
               </div>
 
               <div
-                className={`user-row-details ${expandedRow === item.id ? "expanded" : ""}`}
+                className={`user-row-details ${
+                  expandedRow === item.id ? "expanded" : ""
+                }`}
               >
-                <div className="details-content">
-                  <strong>Tafsilot:</strong> {item.details}
-                </div>
+                <strong>Tafsilot:</strong> {item.details}
               </div>
-
             </div>
           ))}
         </div>
