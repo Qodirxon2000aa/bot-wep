@@ -104,6 +104,52 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
+  // 🔥 ORDER YUBORISH (Stars, Premium va h.k.)
+const createOrder = async ({ amount, sent, type, overall }) => {
+  try {
+    if (!user?.id) {
+      throw new Error("User ID yo‘q");
+    }
+
+    const actualUserId = user.isTelegram ? user.id : "7521806735";
+
+    const url =
+      `https://m4746.myxvest.ru/webapp/order.php` +
+      `?user_id=${actualUserId}` +
+      `&amount=${amount}` +
+      `&sent=@${sent.replace("@", "")}` +
+      `&type=${type}` +
+      `&overall=${overall}`;
+
+    console.log("📤 ORDER URL:", url);
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const data = await res.json();
+    console.log("📥 ORDER RESPONSE:", data);
+
+    if (data.ok) {
+      // 🔄 order yuborilgach hammasini yangilaymiz
+      await refreshUser();
+      return { ok: true };
+    }
+
+    return { ok: false, message: "Order saqlanmadi" };
+  } catch (err) {
+    console.error("❌ createOrder error:", err.message);
+    return { ok: false, message: err.message };
+  }
+};
+
+
+
+
+
   // ✅ Payments tarixini olish
   const fetchPayments = async (userId, isTelegram = true) => {
     try {
@@ -244,12 +290,13 @@ export const TelegramProvider = ({ children }) => {
     <TelegramContext.Provider
       value={{
         user,
-        apiUser,
-        orders,
-        payments,
-        loading,
-        refreshUser,
-        tg: window.Telegram?.WebApp,
+    apiUser,
+    orders,
+    payments,
+    loading,
+    refreshUser,
+    createOrder, // 🔥 QO‘SHILDI
+    tg: window.Telegram?.WebApp,
       }}
     >
       {children}

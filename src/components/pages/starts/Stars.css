@@ -1,0 +1,141 @@
+/* 🌫 OVERLAY + BLUR */
+.stars-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: overlayFade 0.25s ease-out;
+}
+
+/* ⭐ MODAL */
+.stars-modal {
+  position: relative;
+  background: #fff;
+  width: 90%;
+  max-width: 350px;
+  padding: 22px 20px 20px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: slideUpFade 0.35s ease-out;
+}
+
+/* TITLE */
+.stars-modal h3 {
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+/* INPUTS */
+.stars-modal input {
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* BUY BUTTON */
+.stars-modal button {
+  padding: 12px;
+  font-size: 16px;
+  background: gold;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ❌ CLOSE BUTTON */
+.stars-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stars-close-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* 🔥 ANIMATIONS */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes overlayFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+
+.stars-price-box {
+  margin-top: 10px;
+  padding: 12px;
+  background: linear-gradient(135deg, #1d976c, #93f9b9);
+  border-radius: 10px;
+  color: #fff;
+  text-align: center;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.stars-price-box span {
+  display: block;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.stars-price-box strong {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+
+.stars-price-box {
+  margin-top: 12px;
+  padding: 14px;
+  background: linear-gradient(135deg, #0f2027, #2c5364);
+  border-radius: 12px;
+  color: #fff;
+  text-align: center;
+}
+
+.stars-price-box span {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.stars-price-box strong {
+  display: block;
+  font-size: 22px;
+  margin-top: 4px;
+  font-weight: bold;
+}
