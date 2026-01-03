@@ -6,17 +6,21 @@ import { useUserData } from "@/context/UserDataContext";
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
 
-const { user } = useTelegram();
-const { apiUser, loading } = useUserData();
+  const { user } = useTelegram();
+  const { apiUser, loading, refreshBalance } = useUserData();
 
-  const profilePhotoUrl =
-  user?.photo_url || apiUser?.profile || null;
+  const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
 
-  // 🔥 Balance faqat CONTEXT dan
-const balance = loading
-  ? "Yuklanmoqda..."
-  : apiUser?.balance ?? "0";
+  // ✅ Balansni formatlash (string -> number -> formatted string)
+  const formatBalance = (balance) => {
+    if (!balance) return "0";
+    const num = parseInt(balance, 10);
+    return num.toLocaleString('uz-UZ'); // 259000 -> "259 000"
+  };
 
+  const balance = loading
+    ? "Yuklanmoqda..."
+    : formatBalance(apiUser?.balance);
 
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
@@ -56,13 +60,31 @@ const balance = loading
             </div>
 
             <div className="user-modal-info">
-              <h3>{user?.first_name} {user?.last_name}</h3>
-              <p>{user?.username || "Username yo‘q"}</p>
+              <h3>{user?.first_name} {user?.last_name || ""}</h3>
+              <p>{user?.username || "Username yo'q"}</p>
               <small>ID: {user?.id}</small>
 
               <div style={{ marginTop: "8px", fontWeight: "bold", fontSize: "18px" }}>
                 💰 Balance: {balance} UZS
               </div>
+
+              {/* ✅ Refresh tugmasi */}
+              {!loading && (
+                <button
+                  onClick={refreshBalance}
+                  style={{
+                    marginTop: "8px",
+                    padding: "6px 12px",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    borderRadius: "6px",
+                    border: "1px solid #ccc",
+                    background: "#f0f0f0"
+                  }}
+                >
+                  🔄 Yangilash
+                </button>
+              )}
             </div>
           </div>
         </div>
