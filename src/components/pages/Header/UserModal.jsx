@@ -11,10 +11,7 @@ const UserModal = ({ onClose }) => {
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
 
   // 🔥 Balance faqat CONTEXT dan
-const balance = loading
-  ? "Yuklanmoqda..."
-  : apiUser?.balance ?? "0";
-
+  const balance = loading ? "Yuklanmoqda..." : apiUser?.balance || "0";
 
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
