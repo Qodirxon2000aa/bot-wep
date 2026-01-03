@@ -1,3 +1,4 @@
+// TelegramContext.jsx (asosiysi o'zgarmadi: apiUser va profile ni saqlaydi, faqat balance ni modalda qayta fetch qilish mumkin)
 import { createContext, useContext, useEffect, useState } from "react";
 
 const TelegramContext = createContext(null);
@@ -9,7 +10,6 @@ export const TelegramProvider = ({ children }) => {
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
-
     if (tg) {
       tg.ready();
       const waitForUser = setInterval(() => {
@@ -26,14 +26,15 @@ export const TelegramProvider = ({ children }) => {
           };
           setUser(baseUser);
 
+          // API fetch: profile va boshqa ma'lumotlar uchun (balance ni modalda qayta olish mumkin)
           const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${tgUser.id}`;
           console.log("Fetching API for user:", tgUser.id, "URL:", fetchUrl);
-
           fetch(fetchUrl)
             .then((res) => res.json())
             .then((response) => {
-              console.log("FULL PHP RESPONSE:", response); // <-- bu yerda tekshiring!
+              console.log("FULL PHP RESPONSE:", response);
               if (response.ok && response.data) {
+                // Balance ni contextda saqlaymiz, lekin modalda qayta fetch qilish mumkin
                 setApiUser(response.data);
                 console.log("apiUser set to:", response.data);
               } else {
@@ -46,6 +47,7 @@ export const TelegramProvider = ({ children }) => {
               setApiUser({ balance: "0", profile: null });
             })
             .finally(() => setLoading(false));
+          return; // loading ni fetch tugagach o'chiramiz
         }
       }, 300);
 
