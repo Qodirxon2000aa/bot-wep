@@ -1,0 +1,96 @@
+.premium-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.premium-modal {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  width: 90%;
+  max-width: 420px;
+  border-radius: 18px;
+  padding: 20px;
+  color: #fff;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.animate {
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.premium-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.premium-input {
+  width: 100%;
+  padding: 12px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+}
+
+.premium-plans {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.premium-card {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+  border: 2px solid transparent;
+}
+
+.premium-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.premium-card.active {
+  border-color: #00ffd5;
+  transform: scale(1.05);
+}
+
+.premium-buy-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  background: linear-gradient(135deg, #00ffd5, #00c9ff);
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}

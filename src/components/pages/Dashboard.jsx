@@ -7,16 +7,17 @@ import Telegram from "../../assets/tg.ico";
 import Header from "../pages/Header/Header.jsx";
 import Heart from "../../assets/gifts/heart.png";
 
+import Premium from "../pages/premuium/Premium.jsx";
 import StarsModal from "../pages/starts/Stars.jsx";
 
-// ⭐ navigate ishlashi uchun shart
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // ✅ HOOK FAQAT SHU YERDA
+  // ⭐ MODAL STATES
   const [isStarsOpen, setIsStarsOpen] = useState(false);
+  const [isPremiumOpen, setIsPremiumOpen] = useState(false);
 
   const demoUser = {
     name: "John Doe",
@@ -40,36 +41,42 @@ const Dashboard = () => {
       <br /><br />
 
       <div className="floating-buttons">
-        {/* ⭐ STARS MODAL OPEN */}
+        {/* ⭐ STARS */}
         <div
           className="float-btn left-btn"
           onClick={() => setIsStarsOpen(true)}
         >
-          <img src={Premuim} alt="star" />
+          <img src={Star} alt="stars" />
           <h5>STARS XARIDI</h5>
         </div>
 
-        <div className="float-btn right-btn">
-          <img src={Star} alt="star" />
-          <h5>PREMIUM XARIDI!!</h5>
+        {/* 💎 PREMIUM */}
+        <div
+          className="float-btn right-btn"
+          onClick={() => setIsPremiumOpen(true)}
+        >
+          <img src={Premuim} alt="premium" />
+          <h5>PREMIUM XARIDI</h5>
         </div>
       </div>
 
-      {/* ⭐ Gifts Page Button */}
+      {/* 🎁 GIFTS */}
       <div className="gifts-btn" onClick={() => navigate("/gifts")}>
         <img src={Heart} alt="gift" className="gift-icon" />
         <span>Gifts Page</span>
       </div>
 
-      {/* ✅ STARS MODAL */}
+      {/* ⭐ STARS MODAL */}
       {isStarsOpen && (
         <StarsModal onClose={() => setIsStarsOpen(false)} />
       )}
+
+      {/* 💎 PREMIUM MODAL 🔥 */}
+      {isPremiumOpen && (
+        <Premium onClose={() => setIsPremiumOpen(false)} />
+      )}
     </div>
   );
-  
 };
-
-
 
 export default Dashboard;

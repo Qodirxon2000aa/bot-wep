@@ -3,7 +3,8 @@ import "./Stars.css";
 import { useTelegram } from "../../../../context/TelegramContext";
 
 const StarsModal = ({ onClose }) => {
-  const { createOrder } = useTelegram();
+  // ✅ FAQAT BIR MARTA OLINADI
+  const { createOrder, apiUser } = useTelegram();
 
   const [username, setUsername] = useState("");
   const [amount, setAmount] = useState("");
@@ -11,7 +12,7 @@ const StarsModal = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
-  // 🔥 PRICE faqat settings dan
+  // 🔥 PRICE settings dan
   useEffect(() => {
     fetch("https://m4746.myxvest.ru/webapp/settings.php")
       .then((r) => r.json())
@@ -36,6 +37,14 @@ const StarsModal = ({ onClose }) => {
       return;
     }
 
+    // 🔥 BALANCE TEKSHIRISH
+    const balance = Number(apiUser?.balance || 0);
+
+    if (balance < totalPrice) {
+      alert("❌ Sotib olish uchun mablag‘ yetarli emas");
+      return;
+    }
+
     setSending(true);
 
     const result = await createOrder({
@@ -54,6 +63,7 @@ const StarsModal = ({ onClose }) => {
       alert("❌ Xatolik: " + result.message);
     }
   };
+  const balance = loading ? "..." : apiUser?.balance || "0";
 
   return (
     <div className="stars-modal-overlay" onClick={onClose}>
@@ -61,10 +71,11 @@ const StarsModal = ({ onClose }) => {
         <button className="stars-close-btn" onClick={onClose}>✕</button>
 
         <h3>⭐ Stars Xaridi</h3>
+        <strong>Hisobingiz : {balance} </strong>
 
         <input
           type="text"
-          placeholder="Username (ahdsiz)"
+          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -85,7 +96,10 @@ const StarsModal = ({ onClose }) => {
           </div>
         )}
 
-        <button onClick={handleSubmit} disabled={sending}>
+        <button
+          onClick={handleSubmit}
+          disabled={sending || Number(apiUser?.balance || 0) < totalPrice}
+        >
           {sending ? "Yuborilmoqda..." : "Sotib olish"}
         </button>
       </div>
