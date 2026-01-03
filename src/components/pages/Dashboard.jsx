@@ -13,7 +13,6 @@ const Dashboard = () => {
 
   const [tgUserId, setTgUserId] = useState(null);
   const [balance, setBalance] = useState(0);
-  const [isTelegram, setIsTelegram] = useState(false);
 
   const demoUser = {
     name: "John Doe",
@@ -23,25 +22,27 @@ const Dashboard = () => {
   const storedUser = localStorage.getItem("userData");
   const user = storedUser ? JSON.parse(storedUser) : demoUser;
 
-  // 🔹 Telegram WebApp INIT
+  // 🔥 TELEGRAM WEBAPP INIT
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
       const tg = window.Telegram.WebApp;
-      tg.expand(); // WebApp to‘liq ochiladi
-
-      setIsTelegram(true);
+      tg.expand();
 
       const userId = tg.initDataUnsafe?.user?.id;
+
       if (userId) {
+        alert(`ID olindi ✅\nUser ID: ${userId}`);
         setTgUserId(userId);
         getBalance(userId);
+      } else {
+        alert("ID aniqlanmadi ❌");
       }
     } else {
-      console.log("Telegram WebApp emas ❌");
+      alert("Telegram WebApp emas ❌");
     }
   }, []);
 
-  // 🔹 Balance olish
+  // 🔹 BALANCE OLISH
   const getBalance = (userId) => {
     fetch(`get_user.php?user_id=${userId}`)
       .then((r) => r.json())
@@ -56,7 +57,7 @@ const Dashboard = () => {
   // 🔹 BUY FUNCTION
   const buyStars = (amount) => {
     if (!tgUserId || !amount) {
-      alert("User ID yoki amount yo‘q");
+      alert("User ID yoki amount mavjud emas ❌");
       return;
     }
 
@@ -89,12 +90,10 @@ const Dashboard = () => {
 
       <Reklama />
 
-      {/* 🔹 Balance */}
-      {isTelegram && (
-        <div style={{ textAlign: "center", margin: "10px 0" }}>
-          <b>Balans:</b> {balance} ⭐
-        </div>
-      )}
+      {/* ⭐ BALANCE */}
+      <div style={{ textAlign: "center", margin: "10px 0" }}>
+        <b>Balans:</b> {balance} ⭐
+      </div>
 
       <div className="share-btn">
         <img src={Telegram} alt="telegram" className="tg-icon" />
@@ -121,7 +120,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* 🎁 Gifts */}
+      {/* 🎁 GIFTS */}
       <div className="gifts-btn" onClick={() => navigate("/gifts")}>
         <img src={Heart} alt="gift" className="gift-icon" />
         <span>Gifts Page</span>
