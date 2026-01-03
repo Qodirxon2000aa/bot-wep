@@ -191,8 +191,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 5px;  
-  max-height: 200px;
+  max-height: 120px;
   padding: 24px 18px;
   opacity: 1;
 }
@@ -244,8 +243,7 @@
   .user-table-header,
   .user-table-row {
     grid-template-columns: 2fr 1.2fr 1fr 36px;
-    padding: 12px 14px;
-    font-size: 14px;
+    font-size: 10px;
   }
   .user-expand-icon { font-size: 16px; }
 }

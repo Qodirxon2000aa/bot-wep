@@ -194,6 +194,8 @@ const UserModal = ({ onClose }) => {
                   {activeHistory === "orders" && item.summa && (
                     <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
                       <strong>💰 To'lov:</strong> {item.summa}
+                      <br />
+                      <strong>Qabul Quluvchi:</strong> {item.sent}
                     </div>
                   )}
                   <br />
@@ -221,7 +223,7 @@ const UserModal = ({ onClose }) => {
                       fontSize: '12px',
                       fontWeight: 'bold',
                       display: 'inline-block',
-                      marginBottom: '8px'
+                      marginBottom: '20px'
                     }}
                   >
                     {item.status?.toUpperCase()}
