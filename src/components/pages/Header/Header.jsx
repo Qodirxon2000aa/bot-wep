@@ -35,7 +35,7 @@ const Header = () => {
           </div>
 
           <div className="money">
-            {balance} UZS
+            {balance}   
             <span className="plus">+</span>
           </div>
         </div>
