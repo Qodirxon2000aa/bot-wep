@@ -14,7 +14,7 @@ const TelegramUserIdComponent = () => {
       if (tgUser?.id) {
         setUserId(tgUser.id);
       } else {
-        setUserId("User data not available");
+        setUserId("User data not aaaavailable");
       }
     } else {
       // Local development (browser)
