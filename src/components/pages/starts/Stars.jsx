@@ -32,7 +32,7 @@ const StarsModal = ({ onClose }) => {
     }
 
     if (amount < 50 || amount > 500000) {
-      alert("Stars 50 - 500000 oralig‘ida bo‘lishi kerak");
+      alert("Stars 50 -- 500000 oralig‘ida bo‘lishi kerak");
       return;
     }
 
