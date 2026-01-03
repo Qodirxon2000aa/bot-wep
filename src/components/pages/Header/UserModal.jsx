@@ -113,13 +113,8 @@ const UserModal = ({ onClose }) => {
                 {user?.first_name} {user?.last_name}
               </h3>
               <p>{user?.username || "Username yo'q"}</p>
-              <small>ID: {user?.id}</small>
-              <div className="user-balance">
-                💰 Balance:{" "}
-                {telegramLoading
-                  ? "Yuklanmoqda..."
-                  : `${formatBalance(balance)} UZS`}
-              </div>
+           
+             
             </div>
           </div>
         </div>
