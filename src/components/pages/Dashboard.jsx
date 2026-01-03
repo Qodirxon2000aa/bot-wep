@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./Dashboard.css";
 import Reklama from "../pages/Reklama/Reklama.jsx";
 import Premuim from "../../assets/prem.ico";
 import Star from "../../assets/stars.ico";
-import Telegram from "../../assets/tg.ico";
 import Header from "../pages/Header/Header.jsx";
 import Heart from "../../assets/gifts/heart.png";
 
@@ -12,46 +11,34 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const demoUser = {
-    name: "John Doe",
-    image: "/default-avatar.png",
-  };
-
-  const storedUser = localStorage.getItem("userData");
-  const user = storedUser ? JSON.parse(storedUser) : demoUser;
-
-  // ⭐ Telegram User State
-  const [tgUser, setTgUser] = useState(null);
-
-  // ⭐ Avtomatik Telegram user olish
   useEffect(() => {
+    // ⭐ Telegram WebApp tekshirish
     if (window.Telegram && window.Telegram.WebApp) {
       const tg = window.Telegram.WebApp;
       tg.ready();
 
-      if (tg.initDataUnsafe?.user) {
-        setTgUser(tg.initDataUnsafe.user);
+      const user = tg.initDataUnsafe?.user;
+
+      if (user) {
+        alert(
+          `Telegram ma'lumotlari:\n\n` +
+          `ID: ${user.id}\n` +
+          `Ism: ${user.first_name}\n` +
+          `Username: @${user.username || "yo‘q"}`
+        );
+      } else {
+        alert("Telegram user topilmadi!");
       }
+    } else {
+      alert("Telegram WebApp aniqlanmadi!");
     }
   }, []);
 
   return (
     <div className="dashboard">
-      <Header user={user} />
+      <Header />
 
       <Reklama />
-
-      {/* ⭐ TELEGRAM USER INFO (AUTOMATIC) */}
-      {tgUser && (
-        <div className="tg-user-box">
-          <h4>Telegram Account</h4>
-          <p><b>ID:</b> {tgUser.id}</p>
-          <p><b>Name:</b> {tgUser.first_name}</p>
-          <p><b>Username:</b> @{tgUser.username || "yo‘q"}</p>
-        </div>
-      )}
-
-      <br />
 
       <div className="floating-buttons">
         <div className="float-btn left-btn">
