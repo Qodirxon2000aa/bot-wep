@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import "./UserModal.css";
 import { useTelegram } from "../../../../context/TelegramContext";
+import { useUserData } from "../../../../context/UserDataContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
 
-  const { user, apiUser, loading } = useTelegram();
+const { user } = useTelegram();
+const { apiUser, loading } = useUserData();
 
-  // 🔥 Profil rasmi: Telegram yoki API
-  const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
+  const profilePhotoUrl =
+  user?.photo_url || apiUser?.profile || null;
 
   // 🔥 Balance faqat CONTEXT dan
 const balance = loading
