@@ -51,7 +51,7 @@ const Dashboard = () => {
 
         <div className="float-btn right-btn">
           <img src={Star} alt="star" />
-          <h5>PREMIUM XARIDI</h5>
+          <h5>PREMIUM XARIDI!!</h5>
         </div>
       </div>
 
