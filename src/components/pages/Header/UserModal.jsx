@@ -9,36 +9,43 @@ const UserModal = ({ onClose }) => {
   // Telegram WebApp API
   const tg = window.Telegram?.WebApp;
 
-  // Profile rasmi: Telegram user photo yoki API dan
+  // Profile rasmi
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
 
   // ✅ Balance ni context dan olamiz
   const balance = apiUser?.balance || "0";
 
-  // ✅ Modal ochilganda:
-  // 1. Telegram BackButton ni yoqamiz
-  // 2. Balance ni yangilaymiz
+  // ✅ Modal ochilganda balance ni yangilash
   useEffect(() => {
-    // Telegram BackButton ni ko'rsatish
-    if (tg) {
-      tg.BackButton.show();
-      tg.BackButton.onClick(onClose);
+    console.log("🔄 UserModal ochildi - balance yangilanmoqda...");
+    
+    // BackButton ni xavfsiz ishlatish (version check)
+    if (tg?.BackButton?.isSupported !== false) {
+      try {
+        tg.BackButton.show();
+        tg.BackButton.onClick(onClose);
+      } catch (e) {
+        console.warn("BackButton xatolik:", e);
+      }
     }
 
     // Balance ni yangilash
     if (refreshUser) {
-      console.log("🔄 UserModal ochildi - balance yangilanmoqda...");
       refreshUser();
     }
 
-    // Cleanup: Modal yopilganda BackButton ni o'chirish
+    // Cleanup
     return () => {
-      if (tg) {
-        tg.BackButton.hide();
-        tg.BackButton.offClick(onClose);
+      if (tg?.BackButton?.isSupported !== false) {
+        try {
+          tg.BackButton.hide();
+          tg.BackButton.offClick(onClose);
+        } catch (e) {
+          console.warn("BackButton cleanup xatolik:", e);
+        }
       }
     };
-  }, [refreshUser, onClose, tg]);
+  }, []); // Faqat bir marta
 
   // 📜 Demo history
   const historyData = [
@@ -66,9 +73,13 @@ const UserModal = ({ onClose }) => {
   ];
 
   const toggleRow = (id) => {
-    // Telegram Haptic Feedback
-    if (tg?.HapticFeedback) {
-      tg.HapticFeedback.impactOccurred('light');
+    // Haptic Feedback - xavfsiz ishlatish
+    if (tg?.HapticFeedback?.impactOccurred) {
+      try {
+        tg.HapticFeedback.impactOccurred('light');
+      } catch (e) {
+        // Ignore
+      }
     }
     setExpandedRow(expandedRow === id ? null : id);
   };
@@ -79,24 +90,17 @@ const UserModal = ({ onClose }) => {
     return bal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   };
 
-  // Close tugmasi bosilganda Haptic Feedback
+  // Close
   const handleClose = () => {
-    if (tg?.HapticFeedback) {
-      tg.HapticFeedback.impactOccurred('medium');
+    if (tg?.HapticFeedback?.impactOccurred) {
+      try {
+        tg.HapticFeedback.impactOccurred('medium');
+      } catch (e) {
+        // Ignore
+      }
     }
     onClose();
   };
-
-  // Debug logs
-  useEffect(() => {
-    console.log("=== UserModal Debug ===");
-    console.log("👤 User:", user);
-    console.log("💰 API User:", apiUser);
-    console.log("💵 Balance:", balance);
-    console.log("⏳ Loading:", telegramLoading);
-    console.log("📱 Is Telegram:", user?.isTelegram);
-    console.log("======================");
-  }, [user, apiUser, balance, telegramLoading]);
 
   return (
     <div className="user-modal-overlay" onClick={handleClose}>
@@ -116,7 +120,6 @@ const UserModal = ({ onClose }) => {
                     objectFit: "cover",
                   }}
                   onError={(e) => {
-                    console.warn("❌ Profile photo yuklanmadi:", profilePhotoUrl);
                     e.target.style.display = "none";
                   }}
                 />
@@ -133,7 +136,7 @@ const UserModal = ({ onClose }) => {
               <p>{user?.username || "Username yo'q"}</p>
               <small>ID: {user?.id || "Noma'lum"}</small>
               
-              {/* Balance ko'rsatish */}
+              {/* Balance */}
               <div 
                 style={{ 
                   marginTop: "8px", 
@@ -145,16 +148,21 @@ const UserModal = ({ onClose }) => {
                 💰 Balance: {
                   telegramLoading 
                     ? "⏳ Yuklanmoqda..." 
-                    : balance === "0" && !apiUser
-                      ? "❌ Xatolik"
-                      : `${formatBalance(balance)} UZS`
+                    : `${formatBalance(balance)} UZS`
                 }
               </div>
 
-              {/* Debug info (faqat dev mode da) */}
+              {/* CORS xatoligi haqida ogohlantirish */}
+              {!telegramLoading && balance === "0" && (
+                <small style={{ color: "#ff5722", marginTop: "4px", display: "block" }}>
+                  ⚠️ Server bilan bog'lanish xatoligi (CORS)
+                </small>
+              )}
+
+              {/* DEV MODE */}
               {!user?.isTelegram && (
                 <small style={{ color: "#ff9800", marginTop: "4px", display: "block" }}>
-                  ⚠️ DEV MODE
+                  🔧 DEV MODE
                 </small>
               )}
             </div>
