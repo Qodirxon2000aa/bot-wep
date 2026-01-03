@@ -1,38 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./UserModal.css";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
-  const [user, setUser] = useState(null);
-  const [historyData, setHistoryData] = useState([]);
+  const [tgUser, setTgUser] = useState(null);
 
-  // 🔹 Telegram WebApp + Backend fetch
+  // 🔹 Telegram WebApp integration
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
       const tg = window.Telegram.WebApp;
       tg.expand();
 
-      if (tg.initDataUnsafe?.user) {
-        const user_id = tg.initDataUnsafe.user.id;
-
-        fetch(`https://multinet.uz/webapp/get_user.php?user_id=${user_id}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === "success") {
-              setUser({
-                name: data.name,
-                username: data.username,
-                avatar: data.avatar || null,
-              });
-
-              // Agar history backend’dan kelsa
-              setHistoryData(data.history || []);
-            }
-          })
-          .catch(err => console.error("API error:", err));
+      if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        setTgUser(tg.initDataUnsafe.user);
+      } else {
+        alert("Web App Telegram ichida ochilmagan!");
       }
     }
   }, []);
+
+  const historyData = [
+    {
+      id: 1,
+      type: "Transfer",
+      amount: "+250 000",
+      date: "06.12.2025",
+      details: "Sent to account XYZ",
+    },
+    {
+      id: 2,
+      type: "Deposit",
+      amount: "+500 000",
+      date: "05.12.2025",
+      details: "Received from Bank",
+    },
+    {
+      id: 3,
+      type: "Purchase",
+      amount: "-120 000",
+      date: "04.12.2025",
+      details: "Bought premium stars",
+    },
+  ];
 
   const toggleRow = (id) => {
     setExpandedRow(expandedRow === id ? null : id);
@@ -45,17 +54,19 @@ const UserModal = ({ onClose }) => {
         {/* Header */}
         <div className="user-modal-header">
           <div className="user-modal-profile">
-            <div
-              className="user-modal-avatar"
-              style={{
-                backgroundImage: user?.avatar
-                  ? `url(${user.avatar})`
-                  : "none",
-              }}
-            ></div>
+            <div className="user-modal-avatar">
+              {tgUser?.photo_url && (
+                <img src={tgUser.photo_url} alt="avatar" />
+              )}
+            </div>
+
             <div className="user-modal-info">
-              <h3>{user ? user.name : "Loading..."}</h3>
-              <p>{user ? `@${user.username}` : ""}</p>
+              <h3>
+                {tgUser
+                  ? `${tgUser.first_name || ""} ${tgUser.last_name || ""}`
+                  : "Loading..."}
+              </h3>
+              <p>@{tgUser?.username || "no_username"}</p>
             </div>
           </div>
         </div>
@@ -76,12 +87,6 @@ const UserModal = ({ onClose }) => {
           </div>
 
           {/* Rows */}
-          {historyData.length === 0 && (
-            <p style={{ textAlign: "center", opacity: 0.6 }}>
-              History mavjud emas
-            </p>
-          )}
-
           {historyData.map((item) => (
             <div key={item.id} className="user-row-wrapper">
 
