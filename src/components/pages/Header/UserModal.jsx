@@ -193,7 +193,7 @@ const UserModal = ({ onClose }) => {
                       <strong>Qabul Quluvchi:</strong> {item.sent}
                     </div>
                   )}
-                  <br />
+                 
                    
                   {/* ✅ Payments uchun method */}
                   {activeHistory === "payments" && item.method && (
