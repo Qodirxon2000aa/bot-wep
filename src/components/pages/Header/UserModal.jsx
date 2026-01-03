@@ -204,6 +204,9 @@ const UserModal = ({ onClose }) => {
                   {activeHistory === "payments" && item.method && (
                     <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
                       <strong>🏦 To'lov usuli:</strong> {item.type}
+                      <br />
+                      <br />
+                       <strong>💰 To'lov :</strong> {item.amount}
                     </div>
                   )}
 
