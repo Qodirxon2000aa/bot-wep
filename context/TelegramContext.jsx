@@ -14,11 +14,7 @@ export const TelegramProvider = ({ children }) => {
       return;
     }
 
-    tg.ready();
-    tg.expand();
-    tg.requestFullscreen?.();
-    tg.disableVerticalSwipes?.();
-    tg.MainButton?.hide();
+
 
     setTelegram(tg);
 
