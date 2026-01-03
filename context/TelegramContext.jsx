@@ -7,66 +7,106 @@ export const TelegramProvider = ({ children }) => {
   const [apiUser, setApiUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Balance ni API dan olish
   const fetchUserFromApi = async (userId, isTelegram = true) => {
     try {
       setLoading(true);
 
-      // 🔥 DEV mode bo'lsa real Telegram ID ishlatamiz
-      const actualUserId = !isTelegram 
-        ? "7887859754"  // Real Telegram ID
-        : userId;
+      // DEV mode bo'lsa real Telegram ID
+      const actualUserId = !isTelegram ? "7887859754" : userId;
 
       const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${actualUserId}`;
       
-      console.log("🌐 TelegramContext fetch:", fetchUrl);
-      console.log("🆔 Actual User ID:", actualUserId);
+      console.log("=== API Fetch Start ===");
+      console.log("🌐 URL:", fetchUrl);
+      console.log("🆔 User ID:", actualUserId);
       console.log("📱 Is Telegram:", isTelegram);
 
       const res = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
         mode: 'cors',
+        cache: 'no-cache', // ✅ Cache ni o'chirish
       });
 
-      console.log("📥 Response status:", res.status, res.ok);
+      console.log("📥 Response Status:", res.status, res.ok);
 
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
 
       const text = await res.text();
-      console.log("📄 Raw response:", text);
+      console.log("📄 Raw Response:", text);
 
       const response = JSON.parse(text);
       console.log("✅ Parsed JSON:", response);
 
       if (response.ok && response.data) {
-        console.log("💰 Balance from API:", response.data.balance);
-        setApiUser(response.data);
+        const userData = {
+          balance: response.data.balance || "0",
+          profile: response.data.profile || null,
+          // Qo'shimcha ma'lumotlar bo'lsa
+          ...response.data
+        };
+        
+        console.log("💰 Balance:", userData.balance);
+        console.log("🖼️ Profile:", userData.profile);
+        
+        setApiUser(userData);
+        return userData; // ✅ Return qilish
       } else {
-        console.warn("⚠️ Invalid response structure");
+        console.warn("⚠️ Invalid response structure:", response);
         setApiUser({ balance: "0", profile: null });
+        return { balance: "0", profile: null };
       }
     } catch (err) {
-      console.error("❌ API error:", err);
-      console.error("❌ Error message:", err.message);
+      console.error("❌ API Error:", err);
+      console.error("❌ Error Details:", err.message);
       setApiUser({ balance: "0", profile: null });
+      return { balance: "0", profile: null };
     } finally {
       setLoading(false);
+      console.log("=== API Fetch End ===");
+    }
+  };
+
+  // ✅ User ma'lumotlarini yangilash funksiyasi
+  const refreshUser = async () => {
+    if (user?.id) {
+      console.log("🔄 Refreshing user data...");
+      await fetchUserFromApi(user.id, user.isTelegram);
     }
   };
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
 
-    let interval;
-    let timeout;
-
     if (tg) {
+      console.log("✅ Telegram WebApp topildi");
+      
+      // Telegram WebApp ni tayyor qilish
       tg.ready();
+      tg.expand(); // ✅ To'liq ekranga yoyish
+      
+      // ✅ Theme colors ni o'rnatish
+      if (tg.themeParams) {
+        document.documentElement.style.setProperty(
+          '--tg-theme-bg-color', 
+          tg.themeParams.bg_color || '#ffffff'
+        );
+        document.documentElement.style.setProperty(
+          '--tg-theme-text-color', 
+          tg.themeParams.text_color || '#000000'
+        );
+      }
 
+      let interval;
+      let timeout;
+
+      // ✅ Telegram user ma'lumotlarini olish (har 300ms tekshirish)
       interval = setInterval(() => {
         const tgUser = tg.initDataUnsafe?.user;
 
@@ -79,6 +119,7 @@ export const TelegramProvider = ({ children }) => {
             first_name: tgUser.first_name || "",
             last_name: tgUser.last_name || "",
             username: tgUser.username ? `@${tgUser.username}` : "",
+            language_code: tgUser.language_code || "en",
             isTelegram: true,
             photo_url: tgUser.photo_url || null,
           };
@@ -89,46 +130,57 @@ export const TelegramProvider = ({ children }) => {
         }
       }, 300);
 
-      // 🔥 3 sekundda Telegram user kelmasa → DEV MODE
+      // ✅ 3 soniya kutib, Telegram user kelmasa → DEV MODE
       timeout = setTimeout(() => {
         clearInterval(interval);
 
-        console.warn("⚠️ Telegram user topilmadi → DEV MODE");
+        console.warn("⚠️ Telegram user 3 soniyada topilmadi → DEV MODE");
 
         const devUser = {
           id: "DEV_123456",
           first_name: "Dev",
           last_name: "User",
           username: "@dev_user",
+          language_code: "uz",
           isTelegram: false,
           photo_url: null,
         };
 
         setUser(devUser);
-        fetchUserFromApi(devUser.id, false); // ✅ isTelegram: false
+        fetchUserFromApi(devUser.id, false);
       }, 3000);
 
       return () => {
         clearInterval(interval);
         clearTimeout(timeout);
       };
+    } else {
+      // ===== TELEGRAM YO'Q (Browser test) → DEV MODE =====
+      console.warn("⚠️ Telegram.WebApp mavjud emas → DEV MODE");
+
+      const devUser = {
+        id: "DEV_123456",
+        first_name: "Dev",
+        last_name: "User",
+        username: "@dev_user",
+        language_code: "uz",
+        isTelegram: false,
+        photo_url: null,
+      };
+
+      setUser(devUser);
+      fetchUserFromApi(devUser.id, false);
     }
-
-    // ===== TELEGRAM YO'Q BO'LSA (Browser test) =====
-    console.warn("⚠️ Telegram.WebApp mavjud emas → DEV MODE");
-
-    const devUser = {
-      id: "DEV_123456",
-      first_name: "Dev",
-      last_name: "User",
-      username: "@dev_user",
-      isTelegram: false,
-      photo_url: null,
-    };
-
-    setUser(devUser);
-    fetchUserFromApi(devUser.id, false); // ✅ isTelegram: false
   }, []);
+
+  // ✅ Debug: User va API ma'lumotlarini kuzatish
+  useEffect(() => {
+    console.log("=== Context State ===");
+    console.log("👤 User:", user);
+    console.log("💰 API User:", apiUser);
+    console.log("⏳ Loading:", loading);
+    console.log("====================");
+  }, [user, apiUser, loading]);
 
   return (
     <TelegramContext.Provider
@@ -136,7 +188,8 @@ export const TelegramProvider = ({ children }) => {
         user,
         apiUser,
         loading,
-        refreshUser: () => user?.id && fetchUserFromApi(user.id, user.isTelegram),
+        refreshUser, // ✅ Export qilish
+        tg: window.Telegram?.WebApp, // ✅ Telegram API
       }}
     >
       {children}
@@ -144,4 +197,10 @@ export const TelegramProvider = ({ children }) => {
   );
 };
 
-export const useTelegram = () => useContext(TelegramContext);
+export const useTelegram = () => {
+  const context = useContext(TelegramContext);
+  if (!context) {
+    throw new Error("useTelegram must be used within TelegramProvider");
+  }
+  return context;
+};
