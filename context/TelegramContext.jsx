@@ -31,49 +31,75 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const tg = window.Telegram?.WebApp;
+ useEffect(() => {
+  const tg = window.Telegram?.WebApp;
 
-    // ===== TELEGRAM MODE =====
-    if (tg) {
-      tg.ready();
+  let interval;
+  let timeout;
 
-      const interval = setInterval(() => {
-        const tgUser = tg.initDataUnsafe?.user;
+  if (tg) {
+    tg.ready();
 
-        if (tgUser?.id) {
-          clearInterval(interval);
+    interval = setInterval(() => {
+      const tgUser = tg.initDataUnsafe?.user;
 
-          const baseUser = {
-            id: tgUser.id,
-            first_name: tgUser.first_name || "",
-            last_name: tgUser.last_name || "",
-            username: tgUser.username ? `@${tgUser.username}` : "",
-            isTelegram: true,
-            photo_url: tgUser.photo_url || null,
-          };
+      if (tgUser?.id) {
+        clearInterval(interval);
+        clearTimeout(timeout);
 
-          setUser(baseUser);
-          fetchUserFromApi(tgUser.id);
-        }
-      }, 300);
+        const baseUser = {
+          id: tgUser.id,
+          first_name: tgUser.first_name || "",
+          last_name: tgUser.last_name || "",
+          username: tgUser.username ? `@${tgUser.username}` : "",
+          isTelegram: true,
+          photo_url: tgUser.photo_url || null,
+        };
 
-      return () => clearInterval(interval);
-    }
+        setUser(baseUser);
+        fetchUserFromApi(tgUser.id);
+      }
+    }, 300);
 
-    // ===== DEV MODE =====
-    const devUser = {
-      id: "DEV_123456",
-      first_name: "Dev",
-      last_name: "User",
-      username: "@dev_user",
-      isTelegram: false,
-      photo_url: null,
+    // 🔥 MUHIM: agar 3 sekundda Telegram user kelmasa → DEV MODE
+    timeout = setTimeout(() => {
+      clearInterval(interval);
+
+      console.warn("Telegram user topilmadi → DEV MODE");
+
+      const devUser = {
+        id: "DEV_123456",
+        first_name: "Dev",
+        last_name: "User",
+        username: "@dev_user",
+        isTelegram: false,
+        photo_url: null,
+      };
+
+      setUser(devUser);
+      fetchUserFromApi(devUser.id);
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
     };
+  }
 
-    setUser(devUser);
-    fetchUserFromApi(devUser.id);
-  }, []);
+  // ===== TELEGRAM YO‘Q BO‘LSA =====
+  const devUser = {
+    id: "DEV_123456",
+    first_name: "Dev",
+    last_name: "User",
+    username: "@dev_user",
+    isTelegram: false,
+    photo_url: null,
+  };
+
+  setUser(devUser);
+  fetchUserFromApi(devUser.id);
+}, []);
+
 
   return (
     <TelegramContext.Provider
