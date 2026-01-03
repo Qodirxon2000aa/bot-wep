@@ -5,12 +5,23 @@ import { useTelegram } from "../../../../context/TelegramContext";
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
 
-  const { user, apiUser } = useTelegram();
+  const { user, apiUser, loading } = useTelegram();
 
-  // 🔥 Profil rasmi: Telegramdan birinchi, fallback — API dan
+  // Agar hali yuklanayotgan bo'lsa, loading ko'rsatish mumkin
+  if (loading) {
+    return (
+      <div className="user-modal-overlay">
+        <div className="user-modal">
+          <p>Yuklanmoqda...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Profil rasmi: Telegramdan photo_url birinchi, keyin API dan profile
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
 
-  // 🔥 Balance: to‘g‘ridan-to‘g‘ri apiUser dan olamiz
+  // Balance: faqat apiUser dan olamiz
   const balance = apiUser?.balance || "0";
 
   // 📜 Demo history (o‘zgarmaydi)
@@ -34,7 +45,7 @@ const UserModal = ({ onClose }) => {
               {profilePhotoUrl ? (
                 <img
                   src={profilePhotoUrl}
-                  alt="profile"
+                  alt="Profile"
                   style={{
                     width: "100%",
                     height: "100%",
@@ -42,25 +53,29 @@ const UserModal = ({ onClose }) => {
                     objectFit: "cover",
                   }}
                   onError={(e) => {
+                    // Agar rasm yuklanmasa (masalan, proxy xato bersa) placeholder chiqadi
                     e.target.style.display = "none";
-                    e.target.nextSibling.style.display = "block";
+                    e.target.nextElementSibling.style.display = "block";
                   }}
                 />
               ) : null}
               {!profilePhotoUrl && <div className="avatar-placeholder"></div>}
             </div>
+
             <div className="user-modal-info">
-              <h3>{user?.first_name} {user?.last_name}</h3>
-              <p>{user?.username}</p>
-              <small>ID: {user?.id || "Yuklanmoqda..."}</small>
-              <div style={{ marginTop: "6px", fontWeight: "bold" }}>
+              <h3>
+                {user?.first_name} {user?.last_name}
+              </h3>
+              <p>{user?.username || "Username yo‘q"}</p>
+              <small>ID: {user?.id || "Noma'lum"}</small>
+              <div style={{ marginTop: "8px", fontWeight: "bold", fontSize: "18px" }}>
                 💰 Balance: {balance} UZS
               </div>
             </div>
           </div>
         </div>
 
-        {/* BODY */}
+        {/* BODY - HISTORY */}
         <div className="user-modal-body">
           <h2 className="user-modal-title">HISTORY</h2>
           {historyData.map((item) => (
@@ -76,14 +91,20 @@ const UserModal = ({ onClose }) => {
                   {expandedRow === item.id ? "↑" : "↓"}
                 </div>
               </div>
-              <div className={`user-row-details ${expandedRow === item.id ? "expanded" : ""}`}>
+              <div
+                className={`user-row-details ${
+                  expandedRow === item.id ? "expanded" : ""
+                }`}
+              >
                 <strong>Tafsilot:</strong> {item.details}
               </div>
             </div>
           ))}
         </div>
 
-        <button className="user-modal-close" onClick={onClose}>×</button>
+        <button className="user-modal-close" onClick={onClose}>
+          ×
+        </button>
       </div>
     </div>
   );
