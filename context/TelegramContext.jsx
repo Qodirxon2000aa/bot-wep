@@ -3,12 +3,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 const TelegramContext = createContext(null);
 
 export const TelegramProvider = ({ children }) => {
-  const [user, setUser] = useState(null);      // Telegram user
-  const [apiUser, setApiUser] = useState(null); // PHP dan kelgan data
+  const [user, setUser] = useState(null);       // Telegram user
+  const [apiUser, setApiUser] = useState(null); // PHP dan kelgan data (profile, balance, ...)
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
+    let waitForUser = null;
+    let timeoutId = null;
 
     // =========================
     // 🟢 TELEGRAM MODE
@@ -16,11 +18,12 @@ export const TelegramProvider = ({ children }) => {
     if (tg) {
       tg.ready();
 
-      const waitForUser = setInterval(() => {
+      waitForUser = setInterval(() => {
         const tgUser = tg.initDataUnsafe?.user;
 
         if (tgUser?.id) {
           clearInterval(waitForUser);
+          clearTimeout(timeoutId);
 
           const baseUser = {
             id: tgUser.id,
@@ -32,32 +35,39 @@ export const TelegramProvider = ({ children }) => {
 
           setUser(baseUser);
 
-          // 🔥 TO‘G‘RI PHP API (HTTPS)
+          // 🔥 PHP API — PROFILE RASM SHU YERDA OLINADI
           fetch(
-            `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${tgUser.id}`
+            `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${tgUser.id}`,
+            { cache: "no-store" }
           )
             .then((res) => res.json())
             .then((response) => {
-              console.log("PHP RESPONSE:", response);
+              console.log("PHP RESPONSE (context):", response);
 
               if (response.ok && response.data) {
-                setApiUser(response.data);
+                setApiUser(response.data); // 👈 profile shu yerda
+              } else {
+                setApiUser(null);
               }
             })
             .catch((err) => {
               console.error("PHP API xato:", err);
+              setApiUser(null);
             })
             .finally(() => setLoading(false));
         }
       }, 300);
 
-      // 5 sekunddan keyin majburan to‘xtaydi
-      setTimeout(() => {
+      // ⏱ 5 sekund kutadi, keyin to‘xtaydi
+      timeoutId = setTimeout(() => {
         clearInterval(waitForUser);
         setLoading(false);
       }, 5000);
 
-      return;
+      return () => {
+        clearInterval(waitForUser);
+        clearTimeout(timeoutId);
+      };
     }
 
     // =========================
@@ -76,22 +86,26 @@ export const TelegramProvider = ({ children }) => {
     });
 
     fetch(
-      `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${devId}`
+      `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${devId}`,
+      { cache: "no-store" }
     )
       .then((res) => res.json())
       .then((response) => {
         if (response.ok && response.data) {
           setApiUser(response.data);
+        } else {
+          setApiUser(null);
         }
       })
+      .catch(() => setApiUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   return (
     <TelegramContext.Provider
       value={{
-        user,     // telegram info
-        apiUser,  // profile, balance, status, action
+        user,     // Telegram info
+        apiUser,  // 👈 profile, balance, status, action
         loading,
       }}
     >

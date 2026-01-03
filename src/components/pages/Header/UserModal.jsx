@@ -45,6 +45,8 @@ const UserModal = ({ onClose }) => {
     setExpandedRow(expandedRow === id ? null : id);
   };
 
+  const { apiUser } = useTelegram();
+
   return (
     <div className="user-modal-overlay" onClick={onClose}>
       <div className="user-modal" onClick={(e) => e.stopPropagation()}>
@@ -56,8 +58,7 @@ const UserModal = ({ onClose }) => {
             <div className="user-modal-avatar">
               {profilePhoto ? (
                 <img
-                  src={profilePhoto}
-                  alt="profile"
+                 src={apiUser?.profile} alt="profile" 
                   style={{
                     width: "100%",
                     height: "100%",
