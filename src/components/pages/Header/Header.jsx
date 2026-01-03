@@ -2,7 +2,17 @@
 import React, { useState } from "react";
 import "./Header.css";
 
+
+import { useTelegram } from "../../../../context/TelegramContext";
+
+const { user, apiUser, loading } = useTelegram();
+
 import UserModal from "./UserModal.jsx"; // 🔥 Yangi modal component
+
+
+// 🔥 Profil rasmi: Telegram yoki API
+  const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
+
 
 const Header = ({ user }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,7 +28,7 @@ const Header = ({ user }) => {
           >
             <div className="icon-placeholder">
               <img
-                src="https://freesvg.org/img/abstract-user-flat-4.png"
+                src={profilePhotoUrl}
                 alt="user"
               />
             </div>
