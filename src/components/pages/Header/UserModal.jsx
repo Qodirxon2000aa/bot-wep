@@ -1,39 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./UserModal.css";
 import { useTelegram } from "../../../../context/TelegramContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [balance, setBalance] = useState("0");
 
-  // 🔥 HAMMA MAʼLUMOT CONTEXT’DAN
-  const { user, apiUser, loading } = useTelegram();
+  // 🔥 Telegram user global context'dan
+  const { user } = useTelegram();
 
-  // 🟡 Yuklanish holati
-  if (loading) {
-    return (
-      <div className="user-modal-overlay">
-        <div className="user-modal">
-          <p style={{ textAlign: "center" }}>Yuklanmoqda...</p>
-        </div>
-      </div>
-    );
-  }
+  // 🔄 API dan user ma'lumotlarini olish
+  useEffect(() => {
+    if (!user?.id) return;
 
-  // 🔴 Agar API user kelmagan bo‘lsa
-  if (!apiUser) {
-    return (
-      <div className="user-modal-overlay" onClick={onClose}>
-        <div className="user-modal" onClick={(e) => e.stopPropagation()}>
-          <p style={{ textAlign: "center", color: "red" }}>
-            User maʼlumotlari topilmadi
-          </p>
-          <button className="user-modal-close" onClick={onClose}>×</button>
-        </div>
-      </div>
-    );
-  }
+    fetch(`https://m4746.myxvest.ru/webapp/get_user.php?user_id=${user.id}`)
+      .then((res) => res.json())
+      .then((response) => {
+        console.log("API RESPONSE:", response);
 
-  // 📜 Demo history (keyin API qilsa bo‘ladi)
+        if (response.ok && response.data) {
+          if (response.data.profile) {
+            setProfilePhoto(response.data.profile);
+          }
+
+          if (response.data.balance !== undefined) {
+            setBalance(response.data.balance);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("User data olishda xato:", err);
+      });
+  }, [user?.id]);
+
+  // 📜 Demo history
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
     { id: 2, type: "Deposit", amount: "+500 000", date: "05.12.2025", details: "Received from Bank" },
@@ -48,15 +49,14 @@ const UserModal = ({ onClose }) => {
     <div className="user-modal-overlay" onClick={onClose}>
       <div className="user-modal" onClick={(e) => e.stopPropagation()}>
 
-        {/* ===== HEADER ===== */}
+        {/* HEADER */}
         <div className="user-modal-header">
           <div className="user-modal-profile">
 
-            {/* AVATAR */}
             <div className="user-modal-avatar">
-              {apiUser.profile ? (
+              {profilePhoto ? (
                 <img
-                  src={apiUser.profile}
+                  src={profilePhoto}
                   alt="profile"
                   style={{
                     width: "100%",
@@ -70,27 +70,19 @@ const UserModal = ({ onClose }) => {
               )}
             </div>
 
-            {/* USER INFO */}
             <div className="user-modal-info">
-              <h3>
-                {user?.first_name} {user?.last_name}
-              </h3>
-              <p>{user?.username || "@"}</p>
-              <small>Telegram ID: {user?.id}</small>
-
-              <div style={{ marginTop: 6, fontWeight: "bold" }}>
-                💰 Balance: {apiUser.balance ?? 0} UZS
-              </div>
-
-              <div style={{ fontSize: 12, opacity: 0.7 }}>
-                Status: {apiUser.status}
+              <h3>{user?.first_name} {user?.last_name}</h3>
+              <p>{user?.username}</p>
+              <small>ID: {user?.id || "Yuklanmoqda..."}</small>
+              <div style={{ marginTop: "6px", fontWeight: "bold" }}>
+                💰 Balance: {balance} UZS
               </div>
             </div>
 
           </div>
         </div>
 
-        {/* ===== BODY ===== */}
+        {/* BODY */}
         <div className="user-modal-body">
           <h2 className="user-modal-title">HISTORY</h2>
 
@@ -108,21 +100,14 @@ const UserModal = ({ onClose }) => {
                 </div>
               </div>
 
-              <div
-                className={`user-row-details ${
-                  expandedRow === item.id ? "expanded" : ""
-                }`}
-              >
+              <div className={`user-row-details ${expandedRow === item.id ? "expanded" : ""}`}>
                 <strong>Tafsilot:</strong> {item.details}
               </div>
             </div>
           ))}
         </div>
 
-        {/* ===== CLOSE ===== */}
-        <button className="user-modal-close" onClick={onClose}>
-          ×
-        </button>
+        <button className="user-modal-close" onClick={onClose}>×</button>
       </div>
     </div>
   );
