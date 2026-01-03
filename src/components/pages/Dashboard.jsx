@@ -20,18 +20,17 @@ const Dashboard = () => {
   const storedUser = localStorage.getItem("userData");
   const user = storedUser ? JSON.parse(storedUser) : demoUser;
 
-  // ⭐ Telegram ID state
-  const [telegramId, setTelegramId] = useState(null);
-  const [showAlert, setShowAlert] = useState(false);
+  // ⭐ Telegram User State
+  const [tgUser, setTgUser] = useState(null);
 
-  // ⭐ Telegram WebApp ID aniqlash
+  // ⭐ Avtomatik Telegram user olish
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
       const tg = window.Telegram.WebApp;
       tg.ready();
 
       if (tg.initDataUnsafe?.user) {
-        setTelegramId(tg.initDataUnsafe.user.id);
+        setTgUser(tg.initDataUnsafe.user);
       }
     }
   }, []);
@@ -42,16 +41,17 @@ const Dashboard = () => {
 
       <Reklama />
 
-      {/* ⭐ Telegram ID ko‘rsatish tugmasi */}
-      <div
-        className="share-btn"
-        onClick={() => telegramId && setShowAlert(true)}
-      >
-        <img src={Telegram} alt="telegram" className="tg-icon" />
-        <span>Show Telegram ID</span>
-      </div>
+      {/* ⭐ TELEGRAM USER INFO (AUTOMATIC) */}
+      {tgUser && (
+        <div className="tg-user-box">
+          <h4>Telegram Account</h4>
+          <p><b>ID:</b> {tgUser.id}</p>
+          <p><b>Name:</b> {tgUser.first_name}</p>
+          <p><b>Username:</b> @{tgUser.username || "yo‘q"}</p>
+        </div>
+      )}
 
-      <br /><br />
+      <br />
 
       <div className="floating-buttons">
         <div className="float-btn left-btn">
@@ -64,22 +64,10 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ⭐ Gifts Page */}
       <div className="gifts-btn" onClick={() => navigate("/gifts")}>
         <img src={Heart} alt="gift" className="gift-icon" />
         <span>Gifts Page</span>
       </div>
-
-      {/* ⭐ TELEGRAM ID ALERT MODAL */}
-      {showAlert && (
-        <div className="tg-alert-overlay">
-          <div className="tg-alert">
-            <h3>Telegram ID</h3>
-            <p>{telegramId}</p>
-            <button onClick={() => setShowAlert(false)}>Close</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
