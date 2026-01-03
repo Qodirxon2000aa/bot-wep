@@ -1,4 +1,3 @@
-// TelegramContext.jsx (asosiysi o'zgarmadi: apiUser va profile ni saqlaydi, faqat balance ni modalda qayta fetch qilish mumkin)
 import { createContext, useContext, useEffect, useState } from "react";
 
 const TelegramContext = createContext(null);
@@ -8,14 +7,41 @@ export const TelegramProvider = ({ children }) => {
   const [apiUser, setApiUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchUserFromApi = async (userId) => {
+    try {
+      const res = await fetch(
+        `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${userId}`
+      );
+      const response = await res.json();
+
+      console.log("PHP RESPONSE:", response);
+
+      if (response.ok && response.data) {
+        setApiUser(response.data); // balance, profile, boshqalar
+      } else {
+        setApiUser({ balance: "0", profile: null });
+      }
+    } catch (err) {
+      console.error("API error:", err);
+      setApiUser({ balance: "0", profile: null });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
+
+    // ================= TELEGRAM MODE =================
     if (tg) {
       tg.ready();
-      const waitForUser = setInterval(() => {
+
+      const interval = setInterval(() => {
         const tgUser = tg.initDataUnsafe?.user;
+
         if (tgUser?.id) {
-          clearInterval(waitForUser);
+          clearInterval(interval);
+
           const baseUser = {
             id: tgUser.id,
             first_name: tgUser.first_name || "",
@@ -24,70 +50,45 @@ export const TelegramProvider = ({ children }) => {
             isTelegram: true,
             photo_url: tgUser.photo_url || null,
           };
-          setUser(baseUser);
 
-          // API fetch: profile va boshqa ma'lumotlar uchun (balance ni modalda qayta olish mumkin)
-          const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${tgUser.id}`;
-          console.log("Fetching API for user:", tgUser.id, "URL:", fetchUrl);
-          fetch(fetchUrl)
-            .then((res) => res.json())
-            .then((response) => {
-              console.log("FULL PHP RESPONSE:", response);
-              if (response.ok && response.data) {
-                // Balance ni contextda saqlaymiz, lekin modalda qayta fetch qilish mumkin
-                setApiUser(response.data);
-                console.log("apiUser set to:", response.data);
-              } else {
-                console.warn("API response not ok:", response);
-                setApiUser({ balance: "0", profile: null }); // fallback
-              }
-            })
-            .catch((err) => {
-              console.error("Fetch error:", err);
-              setApiUser({ balance: "0", profile: null });
-            })
-            .finally(() => setLoading(false));
-          return; // loading ni fetch tugagach o'chiramiz
+          setUser(baseUser);
+          fetchUserFromApi(tgUser.id);
         }
       }, 300);
 
       setTimeout(() => {
-        clearInterval(waitForUser);
+        clearInterval(interval);
         setLoading(false);
       }, 5000);
+
       return;
     }
 
-    // DEV MODE
-    console.warn("DEV MODE: Telegram yo‘q");
-    const devId = "DEV_123456";
-    setUser({
-      id: devId,
+    // ================= DEV MODE =================
+    console.warn("DEV MODE");
+
+    const devUser = {
+      id: "DEV_123456",
       first_name: "Dev",
       last_name: "User",
       username: "@dev_user",
       isTelegram: false,
       photo_url: null,
-    });
+    };
 
-    const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${devId}`;
-    console.log("DEV fetch:", fetchUrl);
-    fetch(fetchUrl)
-      .then((res) => res.json())
-      .then((response) => {
-        console.log("DEV PHP RESPONSE:", response);
-        if (response.ok && response.data) {
-          setApiUser(response.data);
-        } else {
-          setApiUser({ balance: "0", profile: null });
-        }
-      })
-      .catch((err) => console.error("DEV fetch error:", err))
-      .finally(() => setLoading(false));
+    setUser(devUser);
+    fetchUserFromApi(devUser.id);
   }, []);
 
   return (
-    <TelegramContext.Provider value={{ user, apiUser, loading }}>
+    <TelegramContext.Provider
+      value={{
+        user,
+        apiUser,
+        loading,
+        refreshUser: () => user?.id && fetchUserFromApi(user.id),
+      }}
+    >
       {children}
     </TelegramContext.Provider>
   );
