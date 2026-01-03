@@ -1,36 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./UserModal.css";
 import { useTelegram } from "../../../../context/TelegramContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
-  const [balance, setBalance] = useState("0");
 
-  // 🔥 Telegram user global context'dan (photo_url bilan)
   const { user, apiUser } = useTelegram();
 
-  // Profil rasmi: Birinchi Telegram photo_url, fallback sifatida apiUser.profile
+  // 🔥 Profil rasmi: Telegramdan birinchi, fallback — API dan
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
 
-  // 🔄 API dan user ma'lumotlarini olish (balance uchun)
-  useEffect(() => {
-    if (!user?.id) return;
-    fetch(`https://m4746.myxvest.ru/webapp/get_user.php?user_id=${user.id}`)
-      .then((res) => res.json())
-      .then((response) => {
-        console.log("API RESPONSE:", response);
-        if (response.ok && response.data) {
-          if (response.data.balance !== undefined) {
-            setBalance(response.data.balance);
-          }
-        }
-      })
-      .catch((err) => {
-        console.error("User data olishda xato:", err);
-      });
-  }, [user?.id]);
+  // 🔥 Balance: to‘g‘ridan-to‘g‘ri apiUser dan olamiz
+  const balance = apiUser?.balance || "0";
 
-  // 📜 Demo history
+  // 📜 Demo history (o‘zgarmaydi)
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
     { id: 2, type: "Deposit", amount: "+500 000", date: "05.12.2025", details: "Received from Bank" },
@@ -58,10 +41,13 @@ const UserModal = ({ onClose }) => {
                     borderRadius: "50%",
                     objectFit: "cover",
                   }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "block";
+                  }}
                 />
-              ) : (
-                <div className="avatar-placeholder"></div>
-              )}
+              ) : null}
+              {!profilePhotoUrl && <div className="avatar-placeholder"></div>}
             </div>
             <div className="user-modal-info">
               <h3>{user?.first_name} {user?.last_name}</h3>
@@ -73,6 +59,7 @@ const UserModal = ({ onClose }) => {
             </div>
           </div>
         </div>
+
         {/* BODY */}
         <div className="user-modal-body">
           <h2 className="user-modal-title">HISTORY</h2>
@@ -95,6 +82,7 @@ const UserModal = ({ onClose }) => {
             </div>
           ))}
         </div>
+
         <button className="user-modal-close" onClick={onClose}>×</button>
       </div>
     </div>
