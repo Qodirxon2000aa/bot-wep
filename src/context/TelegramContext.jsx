@@ -19,18 +19,17 @@ export const TelegramProvider = ({ children }) => {
         photo_url: tgUser.photo_url || null,
         isTelegram: true,
       });
-      return;
+    } else {
+      // DEV MODE
+      setUser({
+        id: "DEV_123456",
+        first_name: "Dev",
+        last_name: "User",
+        username: "@dev_user",
+        photo_url: null,
+        isTelegram: false,
+      });
     }
-
-    // DEV MODE
-    setUser({
-      id: "DEV_123456",
-      first_name: "Dev",
-      last_name: "User",
-      username: "@dev_user",
-      photo_url: null,
-      isTelegram: false,
-    });
   }, []);
 
   return (
@@ -40,4 +39,10 @@ export const TelegramProvider = ({ children }) => {
   );
 };
 
-export const useTelegram = () => useContext(TelegramContext);
+export const useTelegram = () => {
+  const ctx = useContext(TelegramContext);
+  if (!ctx) {
+    throw new Error("useTelegram must be used inside TelegramProvider");
+  }
+  return ctx;
+};

@@ -3,8 +3,8 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 
-import { TelegramProvider } from "../context/TelegramContext.jsx";
-import { UserDataProvider } from "../context/UserDataContext.jsx";
+import { TelegramProvider } from "../src/context/TelegramContext.jsx";
+import { UserDataProvider } from "../src/context/UserDataContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

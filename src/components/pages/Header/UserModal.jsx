@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./UserModal.css";
-import { useTelegram } from "../../../../context/TelegramContext";
-import { useUserData } from "../../../../context/UserDataContext";
+import { useTelegram } from "@/context/TelegramContext";
+import { useUserData } from "@/context/UserDataContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
