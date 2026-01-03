@@ -1,48 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./UserModal.css";
+import { useTelegram } from "../../../../context/TelegramContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
-  const [user, setUser] = useState({
-    id: "",
-    first_name: "",
-    last_name: "",
-    username: ""
-  });
 
-useEffect(() => {
-  const telegram = window.Telegram?.WebApp;
+  // 🔥 ID endi context'dan keladi
+  const { user } = useTelegram();
 
-  if (!telegram) {
-    console.log("Telegram WebApp mavjud emas");
-    return;
-  }
-
-  telegram.ready();
-  telegram.expand();
-  telegram.requestFullscreen?.();
-  telegram.disableVerticalSwipes?.();
-  telegram.MainButton?.hide();
-
-  // 🔴 ID ni aynan sen aytgan usulda olish
-  const tgUser = telegram.initDataUnsafe?.user;
-
-  if (tgUser && tgUser.id) {
-    setUser({
-      id: tgUser.id.toString(),
-      first_name: tgUser.first_name || "",
-      last_name: tgUser.last_name || "",
-      username: tgUser.username ? `@${tgUser.username}` : "Yo'q",
-    });
-
-    console.log("TG USER (your method):", tgUser);
-  } else {
-    console.log("Telegram user topilmadi");
-  }
-}, []);
-
-
-  // Qolgan kod o'zgarmaydi...
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
     { id: 2, type: "Deposit", amount: "+500 000", date: "05.12.2025", details: "Received from Bank" },
@@ -60,9 +25,9 @@ useEffect(() => {
           <div className="user-modal-profile">
             <div className="user-modal-avatar"></div>
             <div className="user-modal-info">
-              <h3>{user.first_name} {user.last_name}</h3>
-              <p>{user.username}</p>
-              <small>ID: {user.id || "Yuklanmoqda..."}</small>
+              <h3>{user?.first_name} {user?.last_name}</h3>
+              <p>{user?.username}</p>
+              <small>ID: {user?.id || "Yuklanmoqda..."}</small>
             </div>
           </div>
         </div>
@@ -87,6 +52,7 @@ useEffect(() => {
             </div>
           ))}
         </div>
+
         <button className="user-modal-close" onClick={onClose}>×</button>
       </div>
     </div>
