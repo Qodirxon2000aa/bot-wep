@@ -286,3 +286,22 @@
 .history-tab:hover {
   transform: scale(1.03);
 }
+.order-status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.order-status.successful,
+.order-status.completed {
+  background: #4caf50;
+  color: white;
+}
+
+.order-status.cancel,
+.order-status.cancelled {
+  background: #f44336;
+  color: white;
+}

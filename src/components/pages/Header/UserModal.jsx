@@ -4,74 +4,48 @@ import { useTelegram } from "../../../../context/TelegramContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
-  const [activeHistory, setActiveHistory] = useState("orders"); // 🔥 NEW
-  const { user, apiUser, loading: telegramLoading, refreshUser } = useTelegram();
+  const [activeHistory, setActiveHistory] = useState("orders");
 
-  const tg = window.Telegram?.WebApp;
+  const { user, apiUser, orders, loading: telegramLoading, refreshUser, tg } = useTelegram();
 
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
   const balance = apiUser?.balance || "0";
 
+  // Haqiqiy orders dan foydalanish
+  const ordersHistory = (orders || []).map((o) => ({
+    id: o.order_id,
+    type: "Order",
+    amount: `-${o.amount}`,
+    date: o.date || "Nomaʼlum sana",
+    details: `Status: ${o.status}\nYuborilgan: ${o.sent}`,
+  }));
+
+  // Payments uchun hozircha fake data (agar backenddan kelmasa)
+  const paymentsHistory = [
+    { id: 101, type: "Payment", amount: "+300 000", date: "04.01.2026", details: "Top up via Payme" },
+    { id: 102, type: "Payment", amount: "+500 000", date: "01.01.2026", details: "Bank transfer" },
+  ];
+
+  const historyData = activeHistory === "orders" ? ordersHistory : paymentsHistory;
+
   useEffect(() => {
-    if (tg?.BackButton?.isSupported !== false) {
+    if (tg) {
       try {
         tg.BackButton.show();
         tg.BackButton.onClick(onClose);
       } catch {}
+      refreshUser();
     }
 
-    refreshUser && refreshUser();
-
     return () => {
-      if (tg?.BackButton?.isSupported !== false) {
+      if (tg) {
         try {
           tg.BackButton.hide();
           tg.BackButton.offClick(onClose);
         } catch {}
       }
     };
-  }, []);
-
-  /* =======================
-     🔥 FAKE DATA
-  ======================= */
-
-  const ordersHistory = [
-    {
-      id: 1,
-      type: "Order",
-      amount: "-150 000",
-      date: "05.01.2026",
-      details: "Premium subscription order",
-    },
-    {
-      id: 2,
-      type: "Order",
-      amount: "-80 000",
-      date: "02.01.2026",
-      details: "Stars package order",
-    },
-  ];
-
-  const paymentsHistory = [
-    {
-      id: 101,
-      type: "Payment",
-      amount: "+300 000",
-      date: "04.01.2026",
-      details: "Top up via Payme",
-    },
-    {
-      id: 102,
-      type: "Payment",
-      amount: "+500 000",
-      date: "01.01.2026",
-      details: "Bank transfer",
-    },
-  ];
-
-  const historyData =
-    activeHistory === "orders" ? ordersHistory : paymentsHistory;
+  }, [tg, onClose, refreshUser]);
 
   const toggleRow = (id) => {
     tg?.HapticFeedback?.impactOccurred?.("light");
@@ -89,7 +63,7 @@ const UserModal = ({ onClose }) => {
   return (
     <div className="user-modal-overlay" onClick={handleClose}>
       <div className="user-modal" onClick={(e) => e.stopPropagation()}>
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
         <div className="user-modal-header">
           <div className="user-modal-profile">
             <div className="user-modal-avatar">
@@ -101,70 +75,48 @@ const UserModal = ({ onClose }) => {
                 </div>
               )}
             </div>
-
             <div className="user-modal-info">
-              <h3>
-                {user?.first_name} {user?.last_name}
-              </h3>
+              <h3>{user?.first_name} {user?.last_name}</h3>
               <p>{user?.username || "Username yo‘q"}</p>
               <small>ID: {user?.id}</small>
-
               <div className="user-balance">
-                💰 Balance:{" "}
-                {telegramLoading
-                  ? "Yuklanmoqda..."
-                  : `${formatBalance(balance)} UZS`}
+                💰 Balance: {telegramLoading ? "Yuklanmoqda..." : `${formatBalance(balance)} UZS`}
               </div>
             </div>
           </div>
         </div>
 
-        {/* ================= BODY ================= */}
+        {/* BODY */}
         <div className="user-modal-body">
           <h2 className="user-modal-title">HISTORY</h2>
 
-          {/* 🔥 FILTER BUTTONS */}
           <div className="history-tabs">
             <button
-              className={`history-tab ${
-                activeHistory === "orders" ? "active" : ""
-              }`}
+              className={`history-tab ${activeHistory === "orders" ? "active" : ""}`}
               onClick={() => setActiveHistory("orders")}
             >
               🛒 Orders
             </button>
-
             <button
-              className={`history-tab ${
-                activeHistory === "payments" ? "active" : ""
-              }`}
+              className={`history-tab ${activeHistory === "payments" ? "active" : ""}`}
               onClick={() => setActiveHistory("payments")}
             >
               💳 Payments
             </button>
           </div>
 
-          {/* ================= TABLE ================= */}
           {historyData.length === 0 ? (
             <p className="empty-history">📭 Hozircha tarix yo‘q</p>
           ) : (
             historyData.map((item) => (
               <div key={item.id} className="user-row-wrapper">
-                <div
-                  className="user-table-row"
-                  onClick={() => toggleRow(item.id)}
-                >
+                <div className="user-table-row" onClick={() => toggleRow(item.id)}>
                   <div>{item.type}</div>
                   <div>{item.amount}</div>
                   <div>{item.date}</div>
                   <div>{expandedRow === item.id ? "↑" : "↓"}</div>
                 </div>
-
-                <div
-                  className={`user-row-details ${
-                    expandedRow === item.id ? "expanded" : ""
-                  }`}
-                >
+                <div className={`user-row-details ${expandedRow === item.id ? "expanded" : ""}`}>
                   <strong>Tafsilot:</strong> {item.details}
                 </div>
               </div>
