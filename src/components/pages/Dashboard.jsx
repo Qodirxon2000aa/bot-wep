@@ -12,27 +12,29 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // ⭐ Telegram WebApp tekshirish
-    if (window.Telegram && window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.ready();
+  if (!window.Telegram || !window.Telegram.WebApp) {
+    alert("Telegram WebApp EMAS");
+    return;
+  }
 
-      const user = tg.initDataUnsafe?.user;
+  const tg = window.Telegram.WebApp;
+  tg.ready();
 
-      if (user) {
-        alert(
-          `Telegram ma'lumotlari:\n\n` +
-          `ID: ${user.id}\n` +
-          `Ism: ${user.first_name}\n` +
-          `Username: @${user.username || "yo‘q"}`
-        );
-      } else {
-        alert("Telegram user topilmadi!");
-      }
-    } else {
-      alert("Telegram WebApp aniqlanmadi!");
-    }
-  }, []);
+  const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+
+  if (!user) {
+    alert("Telegram user yo‘q. Botdan ochilmadi!");
+    return;
+  }
+
+  alert(
+    "Telegram user topildi!\n\n" +
+    "ID: " + user.id + "\n" +
+    "Name: " + user.first_name + "\n" +
+    "Username: @" + (user.username || "yo‘q")
+  );
+}, []);
+
 
   return (
     <div className="dashboard">
