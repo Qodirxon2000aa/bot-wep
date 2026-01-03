@@ -55,21 +55,23 @@ const UserModal = ({ onClose }) => {
         <div className="user-modal-header">
           <div className="user-modal-profile">
 
-            <div className="user-modal-avatar">
-              {profilePhoto ? (
-                <img
-                 src={apiUser?.profile} alt="profile" 
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
-                />
-              ) : (
-                <div className="avatar-placeholder"></div>
-              )}
-            </div>
+          <div className="user-modal-avatar">
+  {profilePhoto ? (
+    <img
+      src={profilePhoto}
+      alt="profile"
+      style={{
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        objectFit: "cover",
+      }}
+    />
+  ) : (
+    <div className="avatar-placeholder"></div>
+  )}
+</div>
+
 
             <div className="user-modal-info">
               <h3>{user?.first_name} {user?.last_name}</h3>
