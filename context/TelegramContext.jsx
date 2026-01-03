@@ -3,109 +3,86 @@ import { createContext, useContext, useEffect, useState } from "react";
 const TelegramContext = createContext(null);
 
 export const TelegramProvider = ({ children }) => {
-  const [user, setUser] = useState(null);       // Telegram user
-  const [apiUser, setApiUser] = useState(null); // PHP dan kelgan data (profile, balance, ...)
+  const [user, setUser] = useState(null); // Telegram user with photo_url
+  const [apiUser, setApiUser] = useState(null); // PHP dan kelgan data
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
-    let waitForUser = null;
-    let timeoutId = null;
 
     // =========================
     // 🟢 TELEGRAM MODE
     // =========================
     if (tg) {
       tg.ready();
-
-      waitForUser = setInterval(() => {
+      const waitForUser = setInterval(() => {
         const tgUser = tg.initDataUnsafe?.user;
-
         if (tgUser?.id) {
           clearInterval(waitForUser);
-          clearTimeout(timeoutId);
-
           const baseUser = {
             id: tgUser.id,
             first_name: tgUser.first_name || "",
             last_name: tgUser.last_name || "",
             username: tgUser.username ? `@${tgUser.username}` : "",
             isTelegram: true,
+            photo_url: tgUser.photo_url || null, // 🔥 Telegramdan profil rasmi URL
           };
-
           setUser(baseUser);
-
-          // 🔥 PHP API — PROFILE RASM SHU YERDA OLINADI
+          // 🔥 TO‘G‘RI PHP API (HTTPS)
           fetch(
-            `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${tgUser.id}`,
-            { cache: "no-store" }
+            `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${tgUser.id}`
           )
             .then((res) => res.json())
             .then((response) => {
-              console.log("PHP RESPONSE (context):", response);
-
+              console.log("PHP RESPONSE:", response);
               if (response.ok && response.data) {
-                setApiUser(response.data); // 👈 profile shu yerda
-              } else {
-                setApiUser(null);
+                setApiUser(response.data);
               }
             })
             .catch((err) => {
               console.error("PHP API xato:", err);
-              setApiUser(null);
             })
             .finally(() => setLoading(false));
         }
       }, 300);
-
-      // ⏱ 5 sekund kutadi, keyin to‘xtaydi
-      timeoutId = setTimeout(() => {
+      // 5 sekunddan keyin majburan to‘xtaydi
+      setTimeout(() => {
         clearInterval(waitForUser);
         setLoading(false);
       }, 5000);
-
-      return () => {
-        clearInterval(waitForUser);
-        clearTimeout(timeoutId);
-      };
+      return;
     }
 
     // =========================
     // 🟡 CHROME / DEV MODE
     // =========================
     console.warn("DEV MODE: Telegram yo‘q");
-
     const devId = "DEV_123456";
-
     setUser({
       id: devId,
       first_name: "Dev",
       last_name: "User",
       username: "@dev_user",
       isTelegram: false,
+      photo_url: null, // Dev modda rasm yo‘q
     });
-
     fetch(
-      `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${devId}`,
-      { cache: "no-store" }
+      `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${devId}`
     )
       .then((res) => res.json())
       .then((response) => {
         if (response.ok && response.data) {
           setApiUser(response.data);
-        } else {
-          setApiUser(null);
         }
       })
-      .catch(() => setApiUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   return (
     <TelegramContext.Provider
       value={{
-        user,     // Telegram info
-        apiUser,  // 👈 profile, balance, status, action
+        user, // telegram info including photo_url
+        apiUser, // profile, balance, status, action
         loading,
       }}
     >
