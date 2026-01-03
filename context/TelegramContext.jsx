@@ -199,76 +199,50 @@ const createOrder = async ({ amount, sent, type, overall }) => {
     }
   };
 
-  useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    
-    if (tg) {
-      console.log("✅ Telegram WebApp found");
-     
-      tg.ready();
-     
-      try {
-        tg.expand();
-      } catch (e) {
-        console.warn("Expand error:", e);
-      }
-      
-      let interval;
-      let timeout;
-      
-      interval = setInterval(() => {
-        const tgUser = tg.initDataUnsafe?.user;
-        if (tgUser?.id) {
-          clearInterval(interval);
-          clearTimeout(timeout);
-          
-          const baseUser = {
-            id: tgUser.id,
-            first_name: tgUser.first_name || "",
-            last_name: tgUser.last_name || "",
-            username: tgUser.username ? `@${tgUser.username}` : "",
-            language_code: tgUser.language_code || "en",
-            isTelegram: true,
-            photo_url: tgUser.photo_url || null,
-          };
-          
-          console.log("✅ Telegram user:", baseUser.id);
-          setUser(baseUser);
-          
-          // Barcha ma'lumotlarni yuklash
-          fetchUserFromApi(tgUser.id, true);
-          fetchOrders(tgUser.id, true);
-          fetchPayments(tgUser.id, true);
-        }
-      }, 300);
-      
-      timeout = setTimeout(() => {
-        clearInterval(interval);
-        console.warn("⚠️ DEV MODE aktiv");
-        
-        const devUser = {
-          id: "DEV_123456",
-          first_name: "Dev",
-          last_name: "User",
-          username: "@dev_user",
-          language_code: "uz",
-          isTelegram: false,
-          photo_url: null,
-        };
-        
-        setUser(devUser);
-        fetchUserFromApi(devUser.id, false);
-        fetchOrders(devUser.id, false);
-        fetchPayments(devUser.id, false);
-      }, 3000);
-      
-      return () => {
+ useEffect(() => {
+  const tg = window.Telegram?.WebApp;
+
+  if (tg) {
+    console.log("✅ Telegram WebApp found");
+
+    tg.ready();
+    tg.expand();
+
+    // 🔒 VIEWPORT LOCK
+    tg.onEvent("viewportChanged", () => {
+      tg.expand();
+    });
+
+    let interval;
+    let timeout;
+
+    interval = setInterval(() => {
+      const tgUser = tg.initDataUnsafe?.user;
+      if (tgUser?.id) {
         clearInterval(interval);
         clearTimeout(timeout);
-      };
-    } else {
-      console.warn("⚠️ Browser mode");
-      
+
+        const baseUser = {
+          id: tgUser.id,
+          first_name: tgUser.first_name || "",
+          last_name: tgUser.last_name || "",
+          username: tgUser.username ? `@${tgUser.username}` : "",
+          language_code: tgUser.language_code || "en",
+          isTelegram: true,
+          photo_url: tgUser.photo_url || null,
+        };
+
+        setUser(baseUser);
+
+        fetchUserFromApi(tgUser.id, true);
+        fetchOrders(tgUser.id, true);
+        fetchPayments(tgUser.id, true);
+      }
+    }, 300);
+
+    timeout = setTimeout(() => {
+      clearInterval(interval);
+
       const devUser = {
         id: "DEV_123456",
         first_name: "Dev",
@@ -278,13 +252,20 @@ const createOrder = async ({ amount, sent, type, overall }) => {
         isTelegram: false,
         photo_url: null,
       };
-      
+
       setUser(devUser);
       fetchUserFromApi(devUser.id, false);
       fetchOrders(devUser.id, false);
       fetchPayments(devUser.id, false);
-    }
-  }, []);
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }
+}, []);
+
 
   return (
     <TelegramContext.Provider
