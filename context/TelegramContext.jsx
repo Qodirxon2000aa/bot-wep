@@ -9,6 +9,8 @@ export const TelegramProvider = ({ children }) => {
 
   const fetchUserFromApi = async (userId) => {
     try {
+      setLoading(true);
+
       const res = await fetch(
         `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${userId}`
       );
@@ -17,7 +19,7 @@ export const TelegramProvider = ({ children }) => {
       console.log("PHP RESPONSE:", response);
 
       if (response.ok && response.data) {
-        setApiUser(response.data); // balance, profile, boshqalar
+        setApiUser(response.data);
       } else {
         setApiUser({ balance: "0", profile: null });
       }
@@ -32,7 +34,7 @@ export const TelegramProvider = ({ children }) => {
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
 
-    // ================= TELEGRAM MODE =================
+    // ===== TELEGRAM MODE =====
     if (tg) {
       tg.ready();
 
@@ -56,17 +58,10 @@ export const TelegramProvider = ({ children }) => {
         }
       }, 300);
 
-      setTimeout(() => {
-        clearInterval(interval);
-        setLoading(false);
-      }, 5000);
-
-      return;
+      return () => clearInterval(interval);
     }
 
-    // ================= DEV MODE =================
-    console.warn("DEV MODE");
-
+    // ===== DEV MODE =====
     const devUser = {
       id: "DEV_123456",
       first_name: "Dev",
