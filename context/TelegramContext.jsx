@@ -13,7 +13,7 @@ export const TelegramProvider = ({ children }) => {
     try {
       setLoading(true);
       // DEV mode uchun real ID
-      const actualUserId = !isTelegram ? "7887859754" : userId;
+      const actualUserId = !isTelegram ? "7521806735" : userId;
       const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${actualUserId}`;
      
       console.log("=== API Fetch Start ===");

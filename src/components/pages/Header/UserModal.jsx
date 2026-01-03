@@ -9,6 +9,10 @@ const UserModal = ({ onClose }) => {
   // ✅ Context faqat bir marta ishlatiladi
   const { user, apiUser, orders, loading: telegramLoading, refreshUser } = useTelegram();
   
+  console.log("🔍 UserModal - orders:", orders);
+  console.log("🔍 UserModal - orders length:", orders?.length);
+  console.log("🔍 UserModal - orders type:", typeof orders, Array.isArray(orders));
+  
   const tg = window.Telegram?.WebApp;
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
   const balance = apiUser?.balance || "0";
@@ -17,12 +21,16 @@ const UserModal = ({ onClose }) => {
   const ordersHistory = (orders || []).map((o) => ({
     id: o.order_id,
     type: o.type || "Order",
-    amount: `-${o.amount}`,
+    amount: `${o.amount} ⭐`, // Stars miqdori
+    summa: `${o.summa?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} UZS`, // Summa
     date: o.date || "Noma'lum sana",
     status: o.status || "pending",
-    sent: o.sent || "0",
-    details: `Status: ${o.status} | Yuborilgan: ${o.sent}`,
+    sent: o.sent || "N/A",
+    details: `Sent to: ${o.sent} | Status: ${o.status} | Summa: ${o.summa} UZS`,
   }));
+
+  console.log("🔍 ordersHistory mapped:", ordersHistory);
+  console.log("🔍 ordersHistory length:", ordersHistory.length);
 
   // ✅ Fake payments data (real data kelganda API dan olinadi)
   const paymentsHistory = [
@@ -43,6 +51,10 @@ const UserModal = ({ onClose }) => {
   ];
 
   const historyData = activeHistory === "orders" ? ordersHistory : paymentsHistory;
+
+  console.log("🔍 activeHistory:", activeHistory);
+  console.log("🔍 historyData:", historyData);
+  console.log("🔍 historyData length:", historyData.length);
 
   useEffect(() => {
     if (tg?.BackButton?.isSupported !== false) {
@@ -142,7 +154,9 @@ const UserModal = ({ onClose }) => {
                   onClick={() => toggleRow(item.id)}
                 >
                   <div>{item.type}</div>
-                  <div>{item.amount}</div>
+                  <div>
+                    {activeHistory === "orders" ? item.amount : item.amount}
+                  </div>
                   <div>{item.date}</div>
                   <div>{expandedRow === item.id ? "↑" : "↓"}</div>
                 </div>
@@ -157,7 +171,15 @@ const UserModal = ({ onClose }) => {
                       {item.status}
                     </div>
                   )}
-                  <strong>Tafsilot:</strong> {item.details}
+                  <div>
+                    <strong>Tafsilot:</strong> {item.details}
+                  </div>
+                  {/* ✅ Summa ko'rsatish (faqat orders uchun) */}
+                  {activeHistory === "orders" && item.summa && (
+                    <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
+                      <strong>💰 To'lov:</strong> {item.summa}
+                    </div>
+                  )}
                 </div>
               </div>
             ))
