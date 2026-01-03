@@ -4,178 +4,149 @@ import { useTelegram } from "../../../../context/TelegramContext";
 
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
+  const [activeHistory, setActiveHistory] = useState("orders"); // 🔥 NEW
   const { user, apiUser, loading: telegramLoading, refreshUser } = useTelegram();
 
-  // Telegram WebApp API
   const tg = window.Telegram?.WebApp;
 
-  // Profile rasmi
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
-
-  // ✅ Balance ni context dan olamiz
   const balance = apiUser?.balance || "0";
 
-  // ✅ Modal ochilganda balance ni yangilash
   useEffect(() => {
-    console.log("🔄 UserModal ochildi - balance yangilanmoqda...");
-    
-    // BackButton ni xavfsiz ishlatish (version check)
     if (tg?.BackButton?.isSupported !== false) {
       try {
         tg.BackButton.show();
         tg.BackButton.onClick(onClose);
-      } catch (e) {
-        console.warn("BackButton xatolik:", e);
-      }
+      } catch {}
     }
 
-    // Balance ni yangilash
-    if (refreshUser) {
-      refreshUser();
-    }
+    refreshUser && refreshUser();
 
-    // Cleanup
     return () => {
       if (tg?.BackButton?.isSupported !== false) {
         try {
           tg.BackButton.hide();
           tg.BackButton.offClick(onClose);
-        } catch (e) {
-          console.warn("BackButton cleanup xatolik:", e);
-        }
+        } catch {}
       }
     };
-  }, []); // Faqat bir marta
+  }, []);
 
-  // 📜 Demo history
-  const historyData = [
-    { 
-      id: 1, 
-      type: "Transfer", 
-      amount: "+250 000", 
-      date: "06.12.2025", 
-      details: "Sent to account XYZ" 
+  /* =======================
+     🔥 FAKE DATA
+  ======================= */
+
+  const ordersHistory = [
+    {
+      id: 1,
+      type: "Order",
+      amount: "-150 000",
+      date: "05.01.2026",
+      details: "Premium subscription order",
     },
-    { 
-      id: 2, 
-      type: "Deposit", 
-      amount: "+500 000", 
-      date: "05.12.2025", 
-      details: "Received from Bank" 
-    },
-    { 
-      id: 3, 
-      type: "Purchase", 
-      amount: "-120 000", 
-      date: "04.12.2025", 
-      details: "Bought premium stars" 
+    {
+      id: 2,
+      type: "Order",
+      amount: "-80 000",
+      date: "02.01.2026",
+      details: "Stars package order",
     },
   ];
 
+  const paymentsHistory = [
+    {
+      id: 101,
+      type: "Payment",
+      amount: "+300 000",
+      date: "04.01.2026",
+      details: "Top up via Payme",
+    },
+    {
+      id: 102,
+      type: "Payment",
+      amount: "+500 000",
+      date: "01.01.2026",
+      details: "Bank transfer",
+    },
+  ];
+
+  const historyData =
+    activeHistory === "orders" ? ordersHistory : paymentsHistory;
+
   const toggleRow = (id) => {
-    // Haptic Feedback - xavfsiz ishlatish
-    if (tg?.HapticFeedback?.impactOccurred) {
-      try {
-        tg.HapticFeedback.impactOccurred('light');
-      } catch (e) {
-        // Ignore
-      }
-    }
+    tg?.HapticFeedback?.impactOccurred?.("light");
     setExpandedRow(expandedRow === id ? null : id);
   };
 
-  // Balance formatlash
-  const formatBalance = (bal) => {
-    if (!bal || bal === "0") return "0";
-    return bal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-  };
+  const formatBalance = (bal) =>
+    bal?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") || "0";
 
-  // Close
   const handleClose = () => {
-    if (tg?.HapticFeedback?.impactOccurred) {
-      try {
-        tg.HapticFeedback.impactOccurred('medium');
-      } catch (e) {
-        // Ignore
-      }
-    }
+    tg?.HapticFeedback?.impactOccurred?.("medium");
     onClose();
   };
 
   return (
     <div className="user-modal-overlay" onClick={handleClose}>
       <div className="user-modal" onClick={(e) => e.stopPropagation()}>
-        {/* HEADER */}
+        {/* ================= HEADER ================= */}
         <div className="user-modal-header">
           <div className="user-modal-profile">
             <div className="user-modal-avatar">
               {profilePhotoUrl ? (
-                <img
-                  src={profilePhotoUrl}
-                  alt="Profile"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
-                />
+                <img src={profilePhotoUrl} alt="Profile" />
               ) : (
                 <div className="avatar-placeholder">
-                  {user?.first_name?.[0]?.toUpperCase() || "?"}
+                  {user?.first_name?.[0] || "?"}
                 </div>
               )}
             </div>
+
             <div className="user-modal-info">
               <h3>
-                {user?.first_name || ""} {user?.last_name || ""}
+                {user?.first_name} {user?.last_name}
               </h3>
-              <p>{user?.username || "Username yo'q"}</p>
-              <small>ID: {user?.id || "Noma'lum"}</small>
-              
-              {/* Balance */}
-              <div 
-                style={{ 
-                  marginTop: "8px", 
-                  fontWeight: "bold", 
-                  fontSize: "18px", 
-                  color: "#4CAF50" 
-                }}
-              >
-                💰 Balance: {
-                  telegramLoading 
-                    ? "⏳ Yuklanmoqda..." 
-                    : `${formatBalance(balance)} UZS`
-                }
+              <p>{user?.username || "Username yo‘q"}</p>
+              <small>ID: {user?.id}</small>
+
+              <div className="user-balance">
+                💰 Balance:{" "}
+                {telegramLoading
+                  ? "Yuklanmoqda..."
+                  : `${formatBalance(balance)} UZS`}
               </div>
-
-              {/* CORS xatoligi haqida ogohlantirish */}
-              {!telegramLoading && balance === "0" && (
-                <small style={{ color: "#ff5722", marginTop: "4px", display: "block" }}>
-                  ⚠️ Server bilan bog'lanish xatoligi (CORS)
-                </small>
-              )}
-
-              {/* DEV MODE */}
-              {!user?.isTelegram && (
-                <small style={{ color: "#ff9800", marginTop: "4px", display: "block" }}>
-                  🔧 DEV MODE
-                </small>
-              )}
             </div>
           </div>
         </div>
 
-        {/* BODY - HISTORY */}
+        {/* ================= BODY ================= */}
         <div className="user-modal-body">
           <h2 className="user-modal-title">HISTORY</h2>
+
+          {/* 🔥 FILTER BUTTONS */}
+          <div className="history-tabs">
+            <button
+              className={`history-tab ${
+                activeHistory === "orders" ? "active" : ""
+              }`}
+              onClick={() => setActiveHistory("orders")}
+            >
+              🛒 Orders
+            </button>
+
+            <button
+              className={`history-tab ${
+                activeHistory === "payments" ? "active" : ""
+              }`}
+              onClick={() => setActiveHistory("payments")}
+            >
+              💳 Payments
+            </button>
+          </div>
+
+          {/* ================= TABLE ================= */}
           {historyData.length === 0 ? (
-            <p style={{ textAlign: "center", color: "#999", padding: "20px" }}>
-              📭 Hozircha tarix yo'q
-            </p>
+            <p className="empty-history">📭 Hozircha tarix yo‘q</p>
           ) : (
             historyData.map((item) => (
               <div key={item.id} className="user-row-wrapper">
@@ -183,15 +154,16 @@ const UserModal = ({ onClose }) => {
                   className="user-table-row"
                   onClick={() => toggleRow(item.id)}
                 >
-                  <div className="user-action-cell">{item.type}</div>
-                  <div className="user-amount-cell">{item.amount}</div>
-                  <div className="user-date-cell">{item.date}</div>
-                  <div className="user-expand-icon">
-                    {expandedRow === item.id ? "↑" : "↓"}
-                  </div>
+                  <div>{item.type}</div>
+                  <div>{item.amount}</div>
+                  <div>{item.date}</div>
+                  <div>{expandedRow === item.id ? "↑" : "↓"}</div>
                 </div>
-                <div 
-                  className={`user-row-details ${expandedRow === item.id ? "expanded" : ""}`}
+
+                <div
+                  className={`user-row-details ${
+                    expandedRow === item.id ? "expanded" : ""
+                  }`}
                 >
                   <strong>Tafsilot:</strong> {item.details}
                 </div>

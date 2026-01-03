@@ -261,3 +261,28 @@
   display: block;
   background: #000; /* rasm yuklanmaganda ham ko‘rinib tursin */
 }
+.history-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.history-tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  background: #f1f1f1;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.history-tab.active {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: #fff;
+}
+
+.history-tab:hover {
+  transform: scale(1.03);
+}
