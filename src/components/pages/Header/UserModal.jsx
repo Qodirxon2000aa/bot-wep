@@ -10,48 +10,37 @@ const UserModal = ({ onClose }) => {
     username: ""
   });
 
-  useEffect(() => {
-    const tg = window.Telegram?.WebApp;
+useEffect(() => {
+  const telegram = window.Telegram?.WebApp;
 
-    if (tg) {
-      tg.ready();        // WebApp ni tayyor deb belgilaydi
-      tg.expand();       // To'liq ekran qiladi
+  if (!telegram) {
+    console.log("Telegram WebApp mavjud emas");
+    return;
+  }
 
-      // User ma'lumotlarini olish
-      const tgUser = tg.initDataUnsafe?.user;
+  telegram.ready();
+  telegram.expand();
+  telegram.requestFullscreen?.();
+  telegram.disableVerticalSwipes?.();
+  telegram.MainButton?.hide();
 
-      if (tgUser) {
-        setUser({
-          id: tgUser.id?.toString() || "Noma'lum",
-          first_name: tgUser.first_name || "",
-          last_name: tgUser.last_name || "",
-          username: tgUser.username ? `@${tgUser.username}` : "Yo'q"
-        });
-        console.log("TG USER:", tgUser);
-      } else {
-        console.log("Telegram user topilmadi. Kuting...");
-        // Agar darhol bo'lmasa, biroz kutib qayta urinib ko'rish
-        const interval = setInterval(() => {
-          const retryUser = tg.initDataUnsafe?.user;
-          if (retryUser) {
-            setUser({
-              id: retryUser.id?.toString() || "Noma'lum",
-              first_name: retryUser.first_name || "",
-              last_name: retryUser.last_name || "",
-              username: retryUser.username ? `@${retryUser.username}` : "Yo'q"
-            });
-            console.log("Retry muvaffaqiyatli:", retryUser);
-            clearInterval(interval);
-          }
-        }, 500); // Har 0.5 sekunda tekshiradi
+  // 🔴 ID ni aynan sen aytgan usulda olish
+  const tgUser = telegram.initDataUnsafe?.user;
 
-        // 10 sekunddan keyin to'xtatish
-        setTimeout(() => clearInterval(interval), 10000);
-      }
-    } else {
-      console.log("Telegram WebApp mavjud emas");
-    }
-  }, []);
+  if (tgUser && tgUser.id) {
+    setUser({
+      id: tgUser.id.toString(),
+      first_name: tgUser.first_name || "",
+      last_name: tgUser.last_name || "",
+      username: tgUser.username ? `@${tgUser.username}` : "Yo'q",
+    });
+
+    console.log("TG USER (your method):", tgUser);
+  } else {
+    console.log("Telegram user topilmadi");
+  }
+}, []);
+
 
   // Qolgan kod o'zgarmaydi...
   const historyData = [
