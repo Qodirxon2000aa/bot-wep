@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./Header.css";
 
-import { useTelegram } from "../../../context/TelegramContext.jsx";
+import { useTelegram } from "../../../../context/TelegramContext.jsx";
 import UserModal from "./UserModal.jsx";
 
 const Header = () => {
