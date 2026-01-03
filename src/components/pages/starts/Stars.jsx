@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./stars.css";
+import "./Stars.css";
 import { useTelegram } from "../../../../context/TelegramContext";
 
 const StarsModal = ({ onClose }) => {
