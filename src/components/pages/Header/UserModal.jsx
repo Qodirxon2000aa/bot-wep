@@ -184,7 +184,34 @@ const UserModal = ({ onClose }) => {
                   }`}
                 >
                   {/* ✅ Status badge */}
-                  <div 
+                
+                  
+                  <div style={{ marginTop: '8px' }}>
+                    
+                  </div>
+                  
+                  {/* ✅ Orders uchun summa */}
+                  {activeHistory === "orders" && item.summa && (
+                    <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
+                      <strong>💰 To'lov:</strong> {item.summa}
+                    </div>
+                  )}
+                  <br />
+                   
+                  {/* ✅ Payments uchun method */}
+                  {activeHistory === "payments" && item.method && (
+                    <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
+                      <strong>🏦 To'lov usuli:</strong> {item.type}
+                    </div>
+                  )}
+
+                  {activeHistory === "payments" && item.summa && (
+                    <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
+                      <strong>💰 To'lov:</strong> {item.summa}
+                    </div>
+                  )}
+                  <br />
+                   <div 
                     className="status-badge"
                     style={{ 
                       backgroundColor: getStatusColor(item.status),
@@ -199,24 +226,6 @@ const UserModal = ({ onClose }) => {
                   >
                     {item.status?.toUpperCase()}
                   </div>
-                  
-                  <div style={{ marginTop: '8px' }}>
-                    <strong>📋 Tafsilot:</strong> {item.details}
-                  </div>
-                  
-                  {/* ✅ Orders uchun summa */}
-                  {activeHistory === "orders" && item.summa && (
-                    <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
-                      <strong>💰 To'lov:</strong> {item.summa}
-                    </div>
-                  )}
-                  
-                  {/* ✅ Payments uchun method */}
-                  {activeHistory === "payments" && item.method && (
-                    <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
-                      <strong>🏦 To'lov usuli:</strong> {item.method}
-                    </div>
-                  )}
                 </div>
               </div>
             ))
