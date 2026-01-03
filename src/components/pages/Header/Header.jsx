@@ -2,20 +2,23 @@
 import React, { useState } from "react";
 import "./Header.css";
 
-
 import { useTelegram } from "../../../../context/TelegramContext";
+import UserModal from "./UserModal.jsx";
 
-const { user, apiUser, loading } = useTelegram();
-
-import UserModal from "./UserModal.jsx"; // 🔥 Yangi modal component
-
-
-// 🔥 Profil rasmi: Telegram yoki API
-  const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
-
-
-const Header = ({ user }) => {
+const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // ✅ HOOK FAQAT COMPONENT ICHIDA
+  const { user, apiUser, loading } = useTelegram();
+
+  // ✅ PROFIL RASMI (Telegram → API → default)
+  const profilePhotoUrl =
+    user?.photo_url ||
+    apiUser?.profile ||
+    "https://freesvg.org/img/abstract-user-flat-4.png";
+
+  // ✅ BALANCE
+  const balance = loading ? "..." : apiUser?.balance || "0";
 
   return (
     <>
@@ -27,21 +30,18 @@ const Header = ({ user }) => {
             style={{ cursor: "pointer" }}
           >
             <div className="icon-placeholder">
-              <img
-                src={profilePhotoUrl}
-                alt="user"
-              />
+              <img src={profilePhotoUrl} alt="user" />
             </div>
           </div>
 
           <div className="money">
-            0.00 UZS
+            {balance} UZS
             <span className="plus">+</span>
           </div>
         </div>
       </header>
 
-      {/* MODAL COMPONENT */}
+      {/* MODAL */}
       {isModalOpen && (
         <UserModal onClose={() => setIsModalOpen(false)} />
       )}
