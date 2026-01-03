@@ -7,24 +7,13 @@ const UserModal = ({ onClose }) => {
 
   const { user, apiUser, loading } = useTelegram();
 
-  // Agar hali yuklanayotgan bo'lsa, loading ko'rsatish mumkin
-  if (loading) {
-    return (
-      <div className="user-modal-overlay">
-        <div className="user-modal">
-          <p>Yuklanmoqda...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Profil rasmi: Telegramdan photo_url birinchi, keyin API dan profile
+  // Profil rasmi: Telegram photo_url (agar bo‘lsa) yoki API dan
   const profilePhotoUrl = user?.photo_url || apiUser?.profile || null;
 
-  // Balance: faqat apiUser dan olamiz
-  const balance = apiUser?.balance || "0";
+  // Balance: apiUser yuklanganda ko‘rsatamiz, aks holda "Yuklanmoqda..."
+  const balance = loading ? "Yuklanmoqda..." : (apiUser?.balance || "0");
 
-  // 📜 Demo history (o‘zgarmaydi)
+  // 📜 Demo history
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
     { id: 2, type: "Deposit", amount: "+500 000", date: "05.12.2025", details: "Received from Bank" },
@@ -53,9 +42,8 @@ const UserModal = ({ onClose }) => {
                     objectFit: "cover",
                   }}
                   onError={(e) => {
-                    // Agar rasm yuklanmasa (masalan, proxy xato bersa) placeholder chiqadi
                     e.target.style.display = "none";
-                    e.target.nextElementSibling.style.display = "block";
+                    e.target.nextElementSibling && (e.target.nextElementSibling.style.display = "block");
                   }}
                 />
               ) : null}
@@ -63,9 +51,7 @@ const UserModal = ({ onClose }) => {
             </div>
 
             <div className="user-modal-info">
-              <h3>
-                {user?.first_name} {user?.last_name}
-              </h3>
+              <h3>{user?.first_name || ""} {user?.last_name || ""}</h3>
               <p>{user?.username || "Username yo‘q"}</p>
               <small>ID: {user?.id || "Noma'lum"}</small>
               <div style={{ marginTop: "8px", fontWeight: "bold", fontSize: "18px" }}>
@@ -91,20 +77,14 @@ const UserModal = ({ onClose }) => {
                   {expandedRow === item.id ? "↑" : "↓"}
                 </div>
               </div>
-              <div
-                className={`user-row-details ${
-                  expandedRow === item.id ? "expanded" : ""
-                }`}
-              >
+              <div className={`user-row-details ${expandedRow === item.id ? "expanded" : ""}`}>
                 <strong>Tafsilot:</strong> {item.details}
               </div>
             </div>
           ))}
         </div>
 
-        <button className="user-modal-close" onClick={onClose}>
-          ×
-        </button>
+        <button className="user-modal-close" onClick={onClose}>×</button>
       </div>
     </div>
   );
