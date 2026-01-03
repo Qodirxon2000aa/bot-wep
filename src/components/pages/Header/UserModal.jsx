@@ -5,17 +5,35 @@ import { useTelegram } from "../../../../context/TelegramContext";
 const UserModal = ({ onClose }) => {
   const [expandedRow, setExpandedRow] = useState(null);
 
-  // 🔥 HAMMASI CONTEXT’DAN
+  // 🔥 HAMMA MAʼLUMOT CONTEXT’DAN
   const { user, apiUser, loading } = useTelegram();
 
+  // 🟡 Yuklanish holati
   if (loading) {
     return (
       <div className="user-modal-overlay">
-        <div className="user-modal">Yuklanmoqda...</div>
+        <div className="user-modal">
+          <p style={{ textAlign: "center" }}>Yuklanmoqda...</p>
+        </div>
       </div>
     );
   }
 
+  // 🔴 Agar API user kelmagan bo‘lsa
+  if (!apiUser) {
+    return (
+      <div className="user-modal-overlay" onClick={onClose}>
+        <div className="user-modal" onClick={(e) => e.stopPropagation()}>
+          <p style={{ textAlign: "center", color: "red" }}>
+            User maʼlumotlari topilmadi
+          </p>
+          <button className="user-modal-close" onClick={onClose}>×</button>
+        </div>
+      </div>
+    );
+  }
+
+  // 📜 Demo history (keyin API qilsa bo‘ladi)
   const historyData = [
     { id: 1, type: "Transfer", amount: "+250 000", date: "06.12.2025", details: "Sent to account XYZ" },
     { id: 2, type: "Deposit", amount: "+500 000", date: "05.12.2025", details: "Received from Bank" },
@@ -36,7 +54,7 @@ const UserModal = ({ onClose }) => {
 
             {/* AVATAR */}
             <div className="user-modal-avatar">
-              {apiUser?.profile ? (
+              {apiUser.profile ? (
                 <img
                   src={apiUser.profile}
                   alt="profile"
@@ -54,11 +72,18 @@ const UserModal = ({ onClose }) => {
 
             {/* USER INFO */}
             <div className="user-modal-info">
-              <h3>{user?.first_name} {user?.last_name}</h3>
-              <p>{user?.username}</p>
-              <small>ID: {user?.id}</small>
+              <h3>
+                {user?.first_name} {user?.last_name}
+              </h3>
+              <p>{user?.username || "@"}</p>
+              <small>Telegram ID: {user?.id}</small>
+
               <div style={{ marginTop: 6, fontWeight: "bold" }}>
-                💰 Balance: {apiUser?.balance || 0} UZS
+                💰 Balance: {apiUser.balance ?? 0} UZS
+              </div>
+
+              <div style={{ fontSize: 12, opacity: 0.7 }}>
+                Status: {apiUser.status}
               </div>
             </div>
 
@@ -71,7 +96,10 @@ const UserModal = ({ onClose }) => {
 
           {historyData.map((item) => (
             <div key={item.id} className="user-row-wrapper">
-              <div className="user-table-row" onClick={() => toggleRow(item.id)}>
+              <div
+                className="user-table-row"
+                onClick={() => toggleRow(item.id)}
+              >
                 <div className="user-action-cell">{item.type}</div>
                 <div className="user-amount-cell">{item.amount}</div>
                 <div className="user-date-cell">{item.date}</div>
@@ -80,14 +108,21 @@ const UserModal = ({ onClose }) => {
                 </div>
               </div>
 
-              <div className={`user-row-details ${expandedRow === item.id ? "expanded" : ""}`}>
+              <div
+                className={`user-row-details ${
+                  expandedRow === item.id ? "expanded" : ""
+                }`}
+              >
                 <strong>Tafsilot:</strong> {item.details}
               </div>
             </div>
           ))}
         </div>
 
-        <button className="user-modal-close" onClick={onClose}>×</button>
+        {/* ===== CLOSE ===== */}
+        <button className="user-modal-close" onClick={onClose}>
+          ×
+        </button>
       </div>
     </div>
   );

@@ -3,9 +3,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 const TelegramContext = createContext(null);
 
 export const TelegramProvider = ({ children }) => {
-  const [telegram, setTelegram] = useState(null);
-  const [user, setUser] = useState(null);
-  const [apiUser, setApiUser] = useState(null);
+  const [user, setUser] = useState(null);      // Telegram user
+  const [apiUser, setApiUser] = useState(null); // PHP dan kelgan data
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,40 +15,47 @@ export const TelegramProvider = ({ children }) => {
     // =========================
     if (tg) {
       tg.ready();
-     
 
-      setTelegram(tg);
+      const waitForUser = setInterval(() => {
+        const tgUser = tg.initDataUnsafe?.user;
 
-      const tgUser = tg.initDataUnsafe?.user;
+        if (tgUser?.id) {
+          clearInterval(waitForUser);
 
-      if (tgUser?.id) {
-        const baseUser = {
-          id: tgUser.id,
-          first_name: tgUser.first_name || "",
-          last_name: tgUser.last_name || "",
-          username: tgUser.username ? `@${tgUser.username}` : "",
-          isTelegram: true,
-        };
+          const baseUser = {
+            id: tgUser.id,
+            first_name: tgUser.first_name || "",
+            last_name: tgUser.last_name || "",
+            username: tgUser.username ? `@${tgUser.username}` : "",
+            isTelegram: true,
+          };
 
-        setUser(baseUser);
+          setUser(baseUser);
 
-        // 🔥 PHP API SO‘ROV SHU YERDA
-        fetch(`http://multinet.uz/webapp/get_user.php?user_id=${tgUser.id}`)
-          .then((res) => res.json())
-          .then((response) => {
-            console.log("API RESPONSE (context):", response);
+          // 🔥 TO‘G‘RI PHP API (HTTPS)
+          fetch(
+            `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${tgUser.id}`
+          )
+            .then((res) => res.json())
+            .then((response) => {
+              console.log("PHP RESPONSE:", response);
 
-            if (response.ok && response.data) {
-              setApiUser(response.data);
-            }
-          })
-          .catch((err) => {
-            console.error("API xato:", err);
-          })
-          .finally(() => setLoading(false));
-      } else {
+              if (response.ok && response.data) {
+                setApiUser(response.data);
+              }
+            })
+            .catch((err) => {
+              console.error("PHP API xato:", err);
+            })
+            .finally(() => setLoading(false));
+        }
+      }, 300);
+
+      // 5 sekunddan keyin majburan to‘xtaydi
+      setTimeout(() => {
+        clearInterval(waitForUser);
         setLoading(false);
-      }
+      }, 5000);
 
       return;
     }
@@ -57,20 +63,21 @@ export const TelegramProvider = ({ children }) => {
     // =========================
     // 🟡 CHROME / DEV MODE
     // =========================
-    console.warn("DEV MODE (Telegram yo‘q)");
+    console.warn("DEV MODE: Telegram yo‘q");
 
-    const devUser = {
-      id: "DEV_123456",
+    const devId = "DEV_123456";
+
+    setUser({
+      id: devId,
       first_name: "Dev",
       last_name: "User",
       username: "@dev_user",
       isTelegram: false,
-    };
+    });
 
-    setUser(devUser);
-
-    // 🔧 DEV MODE UCHUN API
-    fetch(`http://multinet.uz/webapp/get_user.php?user_id=${devUser.id}`)
+    fetch(
+      `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${devId}`
+    )
       .then((res) => res.json())
       .then((response) => {
         if (response.ok && response.data) {
@@ -83,9 +90,8 @@ export const TelegramProvider = ({ children }) => {
   return (
     <TelegramContext.Provider
       value={{
-        telegram,
-        user,
-        apiUser,   // 👈 profile, balance, status shu yerda
+        user,     // telegram info
+        apiUser,  // profile, balance, status, action
         loading,
       }}
     >
