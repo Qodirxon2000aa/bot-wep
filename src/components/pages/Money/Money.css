@@ -1,0 +1,614 @@
+/* pages/Money.css */
+.money-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.money-modal {
+  background: #1e1f26;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  padding: 4px;
+  position: relative;
+  color: white;
+}
+
+.money-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.money-title {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 24px;
+}
+
+.money-method,
+.money-amount {
+  margin-bottom: 20px;
+}
+
+.money-method label,
+.money-amount label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.method-selected {
+  background: #2d2e37;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.money-amount input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #2d2e37;
+  border: none;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+}
+
+.money-limits {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  margin-top: 6px;
+}
+
+.money-submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: #ff6b00;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.money-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Kutish oynasi */
+.money-waiting {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.waiting-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #333;
+  border-top: 5px solid #ff6b00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 30px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.money-waiting h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.money-waiting p {
+  font-size: 15px;
+  color: #aaa;
+  line-height: 1.5;
+}
+
+.waiting-note {
+  margin-top: 30px;
+  font-size: 13px;
+  color: #666;
+}
+
+
+/* pages/Money.css - Rasmdagi dizaynni to‘liq nusxalagan! */
+.money-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.payment-modal {
+  background: #1e1f26;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  color: white;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.user-info {
+  background: #2a2b33;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.username {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+.fullname {
+  font-size: 16px;
+}
+
+.section-title {
+  font-size: 18px;
+  margin: 20px 0 15px;
+  text-align: left;
+}
+
+.important-msg {
+  background: #3a2f1f;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.warning-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.red-text {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.deadline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #2d2e37;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.clock-icon {
+  font-size: 18px;
+}
+
+.amount-block {
+  background: linear-gradient(to bottom, #ff4444, #cc0000);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(255, 68, 68, 0.4);
+}
+
+.amount-label {
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.lightning {
+  font-size: 18px;
+}
+
+.big-amount {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.copy-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.card-info {
+  background: #2d2e37;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-label {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.card-number {
+  font-size: 12.5px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.copy-card-btn {
+  background: #3a3b44;
+  border: none;
+  color: white;
+  padding: 15px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.card-owner {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.price-note {
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+  margin: 20px 0;
+}
+
+.ok-btn {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Kutish oynasi (avvalgisidek) */
+.money-waiting {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.waiting-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #333;
+  border-top: 5px solid #ff6b00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 30px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.money-waiting h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.money-waiting p {
+  font-size: 15px;
+  color: #aaa;
+  line-height: 1.5;
+}
+
+.waiting-note {
+  margin-top: 30px;
+  font-size: 13px;
+  color: #666;
+}
+
+.error-message {
+  background: #ff000033;
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 12px;
+  margin: 15px 0;
+  text-align: center;
+}
+
+/* Money.css - avvalgi rasmdagi dizayn saqlanib qoldi, faqat qo'shimcha yo'q */
+.error-message {
+  background: #ff000033;
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 12px;
+  margin: 15px 0;
+  text-align: center;
+}
+
+/* Boshqa stillar avvalgi xabarda berilganidek qoldirilgan */
+
+
+/* Money.css ga qo'shimcha animatsiyalar va taymer */
+
+/* Taymer faol holati */
+.timer-active {
+  animation: pulse 2s infinite;
+}
+
+.timer-countdown {
+  font-size: 20px !important;
+  color: #ff4444;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Natija animatsiyalari */
+.result-animation {
+  text-align: center;
+  padding: 60px 20px;
+  animation: fadeIn 1s ease-in;
+}
+
+.result-animation.success {
+  color: #4caf50;
+}
+
+.result-animation.timeout {
+  color: #ff4444;
+}
+
+.checkmark {
+  font-size: 100px;
+  animation: successCheck 1.5s ease-in-out;
+}
+
+.cross {
+  font-size: 100px;
+  animation: failCross 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes successCheck {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes failCross {
+  0% { transform: rotate(-90deg) scale(0); opacity: 0; }
+  50% { transform: rotate(0) scale(1.2); opacity: 1; }
+  100% { transform: rotate(0) scale(1); }
+}   
+
+
+
+
+/* Chiroyli Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 280px;
+  justify-content: center;
+}
+
+.toast-notification.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* Success va Error turlari */
+.toast-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border-left: 6px solid #00ff88;
+}
+
+.toast-error {
+  background: linear-gradient(135deg, #dc3545, #fd7e14);
+  border-left: 6px solid #ff4444;
+}
+
+/* JS orqali faqat show klassini qo‘shish kerak emas — CSS animatsiyani avto boshqaradi */
+.toast-notification {
+  animation: toastIn 0.6s ease-out forwards, toastOut 0.6s ease-in 2.4s forwards;
+}
+
+@keyframes toastIn {
+  0% {
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastOut {
+  0% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+  }
+}
+
+/* Animatsiyali natija overlay */
+.payment-result-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 16px;
+  animation: fadeInOut 2.5s ease-in-out;
+  z-index: 10;
+}
+
+.payment-result-overlay.success {
+  background-color: rgba(0, 150, 0, 0.9);
+}
+
+.payment-result-overlay.error {
+  background-color: rgba(200, 0, 0, 0.9);
+}
+
+.result-icon {
+  font-size: 100px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  animation: scaleUp 0.6s ease-out;
+}
+
+.result-text {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* To‘lov summasini ko‘rsatish uchun */
+.payment-amount-display {
+   background: #2d2e37;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.amount-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.amount-label {
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.amount-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.copy-amount-btn {
+  background: #3a3b44;
+  border: none;
+  color: white;
+  padding: 15px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+

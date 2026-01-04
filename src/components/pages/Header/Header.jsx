@@ -1,23 +1,21 @@
-// Header.jsx
+// Header.jsx (yangilangan versiya)
 import React, { useState } from "react";
 import "./Header.css";
-
 import { useTelegram } from "../../../../context/TelegramContext.jsx";
 import UserModal from "./UserModal.jsx";
+import Money from "../../pages/Money/Money.jsx"; // Yo'lni loyihangizga moslashtiring
 
 const Header = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isMoneyModalOpen, setIsMoneyModalOpen] = useState(false);
 
-  // ✅ HOOK FAQAT COMPONENT ICHIDA
   const { user, apiUser, loading } = useTelegram();
 
-  // ✅ PROFIL RASMI (Telegram → API → default)
   const profilePhotoUrl =
     user?.photo_url ||
     apiUser?.profile ||
     "https://freesvg.org/img/abstract-user-flat-4.png";
 
-  // ✅ BALANCE
   const balance = loading ? "..." : apiUser?.balance || "0";
 
   return (
@@ -26,24 +24,36 @@ const Header = () => {
         <div className="balance">
           <div
             className="profile-icon"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsUserModalOpen(true)}
             style={{ cursor: "pointer" }}
           >
             <div className="icon-placeholder">
               <img src={profilePhotoUrl} alt="user" />
             </div>
           </div>
-
           <div className="money">
-            {balance}   
-            <span className="plus">+</span>
+            {balance}
+            <span
+              className="plus"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMoneyModalOpen(true);
+              }}
+            >
+              +
+            </span>
           </div>
         </div>
       </header>
 
-      {/* MODAL */}
-      {isModalOpen && (
-        <UserModal onClose={() => setIsModalOpen(false)} />
+      {/* User Modal */}
+      {isUserModalOpen && (
+        <UserModal onClose={() => setIsUserModalOpen(false)} />
+      )}
+
+      {/* Money Modal */}
+      {isMoneyModalOpen && (
+        <Money onClose={() => setIsMoneyModalOpen(false)} />
       )}
     </>
   );
