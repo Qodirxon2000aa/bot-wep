@@ -203,7 +203,7 @@ const PremiumModal = ({ onClose }) => {
         {/* 📝 FORM */}
         {!sending && !success && !error && !insufficientFunds && !validationError && (
           <>
-            <h2>💎 Telegram Premium</h2>
+            <h2>💎 Premium Xaridi</h2>
             <br />
             <div className="balance-info">
               Hisobingiz: <strong>{balance} UZS</strong>

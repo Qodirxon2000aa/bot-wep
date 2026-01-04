@@ -53,6 +53,9 @@
   border: none;
   outline: none;
   font-size: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .premium-plans {
@@ -87,10 +90,11 @@
   width: 100%;
   margin-top: 15px;
   padding: 14px;
-  background: linear-gradient(135deg, #00ffd5, #00c9ff);
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
   border: none;
   border-radius: 12px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  color: #000
 }
