@@ -244,8 +244,11 @@ export const TelegramProvider = ({ children }) => {
 
     if (tg) {
       console.log("✅ Telegram WebApp found");
-      tg.ready();
-      tg.expand();
+       telegram.ready();
+    telegram.expand();
+    telegram.requestFullscreen();
+    telegram.disableVerticalSwipes();
+    telegram.MainButton.hide();
 
       // 🔒 VIEWPORT LOCK
       tg.onEvent("viewportChanged", () => {
