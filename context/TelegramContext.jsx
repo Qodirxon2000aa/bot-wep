@@ -231,90 +231,67 @@ export const TelegramProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
+  const tg = window.Telegram?.WebApp;
+  if (!tg) return;
 
-    if (tg) {
-      console.log("✅ Telegram WebApp found");
-      
-      // 🔥 TO'LIQ EKRAN REJIMI
-      tg.ready();
-      tg.expand();
-      tg.enableClosingConfirmation();
-      
-      // 🔥 Viewport sozlamalari
-      if (tg.setHeaderColor) {
-        tg.setHeaderColor('secondary_bg_color');
-      }
-      if (tg.setBackgroundColor) {
-        tg.setBackgroundColor('#ffffff');
-      }
-      
-      // 🔥 Har doim to'liq ekranda bo'lishi uchun
-      const expandInterval = setInterval(() => {
-        if (tg.viewportHeight < window.innerHeight) {
-          tg.expand();
-        }
-      }, 100);
+  console.log("✅ Telegram WebApp ready");
 
-      // 🔒 VIEWPORT LOCK - Har qanday o'zgarishda expand qilish
-      tg.onEvent("viewportChanged", () => {
-        console.log("📱 Viewport changed, expanding...");
-        tg.expand();
-      });
+  // 🔥 MUHIM: faqat 1 marta
+  tg.ready();
+  tg.expand();
 
-      let interval;
-      let timeout;
+  // 🎨 Ranglar (ixtiyoriy)
+  tg.setHeaderColor?.("secondary_bg_color");
+  tg.setBackgroundColor?.("#ffffff");
 
-      interval = setInterval(() => {
-        const tgUser = tg.initDataUnsafe?.user;
+  // 🔒 Viewport monitoring (expand QILMAYMIZ)
+  const onViewportChange = () => {
+    console.log("📱 Viewport height:", tg.viewportHeight);
+  };
 
-        if (tgUser?.id) {
-          clearInterval(interval);
-          clearTimeout(timeout);
+  tg.onEvent("viewportChanged", onViewportChange);
 
-          const baseUser = {
-            id: tgUser.id,
-            first_name: tgUser.first_name || "",
-            last_name: tgUser.last_name || "",
-            username: tgUser.username ? `@${tgUser.username}` : "",
-            language_code: tgUser.language_code || "en",
-            isTelegram: true,
-            photo_url: tgUser.photo_url || null,
-          };
+  // 👤 Telegram user olish
+  const tgUser = tg.initDataUnsafe?.user;
 
-          setUser(baseUser);
-          fetchUserFromApi(tgUser.id, true);
-          fetchOrders(tgUser.id, true);
-          fetchPayments(tgUser.id, true);
-        }
-      }, 300);
+  if (tgUser?.id) {
+    const baseUser = {
+      id: tgUser.id,
+      first_name: tgUser.first_name || "",
+      last_name: tgUser.last_name || "",
+      username: tgUser.username ? `@${tgUser.username}` : "",
+      language_code: tgUser.language_code || "en",
+      isTelegram: true,
+      photo_url: tgUser.photo_url || null,
+    };
 
-      timeout = setTimeout(() => {
-        clearInterval(interval);
+    setUser(baseUser);
+    fetchUserFromApi(tgUser.id, true);
+    fetchOrders(tgUser.id, true);
+    fetchPayments(tgUser.id, true);
+  } else {
+    // 🧪 DEV MODE
+    const devUser = {
+      id: "DEV_123456",
+      first_name: "Dev",
+      last_name: "User",
+      username: "@dev_user",
+      language_code: "uz",
+      isTelegram: false,
+      photo_url: null,
+    };
 
-        const devUser = {
-          id: "DEV_123456",
-          first_name: "Dev",
-          last_name: "User",
-          username: "@dev_user",
-          language_code: "uz",
-          isTelegram: false,
-          photo_url: null,
-        };
+    setUser(devUser);
+    fetchUserFromApi(devUser.id, false);
+    fetchOrders(devUser.id, false);
+    fetchPayments(devUser.id, false);
+  }
 
-        setUser(devUser);
-        fetchUserFromApi(devUser.id, false);
-        fetchOrders(devUser.id, false);
-        fetchPayments(devUser.id, false);
-      }, 3000);
+  return () => {
+    tg.offEvent("viewportChanged", onViewportChange);
+  };
+}, []);
 
-      return () => {
-        clearInterval(interval);
-        clearInterval(expandInterval);
-        clearTimeout(timeout);
-      };
-    }
-  }, []);
 
   return (
     <TelegramContext.Provider
