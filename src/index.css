@@ -2,3 +2,30 @@
   margin: 0;
   padding: 0;
 }
+
+/* To'liq ekran rejimi */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Telegram WebApp maxsus sozlamalar */
+.telegram-web-app {
+  height: 100vh;
+  height: -webkit-fill-available;
+}

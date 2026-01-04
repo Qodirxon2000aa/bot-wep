@@ -9,7 +9,6 @@ export const TelegramProvider = ({ children }) => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ User ma'lumotlarini olish
   const fetchUserFromApi = async (userId, isTelegram = true) => {
     try {
       setLoading(true);
@@ -66,7 +65,6 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
-  // ✅ Orders tarixini olish
   const fetchOrders = async (userId, isTelegram = true) => {
     try {
       const actualUserId = !isTelegram ? "7521806735" : userId;
@@ -103,7 +101,6 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
-  // 🔥 PREMIUM ORDER YUBORISH - TUZATILGAN
   const createPremiumOrder = async ({ months, sent, overall }) => {
     try {
       if (!user?.id) {
@@ -112,10 +109,9 @@ export const TelegramProvider = ({ children }) => {
 
       const actualUserId = user.isTelegram ? user.id : "7521806735";
       
-      // 🔥 TUZATISH: API "amount" parametrini kutmoqda (3, 6 yoki 12)
       const url = `https://m4746.myxvest.ru/webapp/premium.php` +
         `?user_id=${actualUserId}` +
-        `&amount=${months}` + // ✅ Bu to'g'ri (3, 6 yoki 12)
+        `&amount=${months}` +
         `&sent=${sent.replace("@", "")}` +
         `&overall=${overall}`;
 
@@ -132,7 +128,6 @@ export const TelegramProvider = ({ children }) => {
       console.log("💎 PREMIUM ORDER RESPONSE:", data);
 
       if (data.ok) {
-        // 🔄 order yuborilgach hammasini yangilaymiz
         await refreshUser();
         return {
           ok: true,
@@ -149,7 +144,6 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
-  // 🔥 ORDER YUBORISH (Stars va boshqa turlar uchun)
   const createOrder = async ({ amount, sent, type, overall }) => {
     try {
       if (!user?.id) {
@@ -178,7 +172,6 @@ export const TelegramProvider = ({ children }) => {
       console.log("📥 ORDER RESPONSE:", data);
 
       if (data.ok) {
-        // 🔄 order yuborilgach hammasini yangilaymiz
         await refreshUser();
         return { ok: true };
       }
@@ -190,7 +183,6 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
-  // ✅ Payments tarixini olish
   const fetchPayments = async (userId, isTelegram = true) => {
     try {
       const actualUserId = !isTelegram ? "7521806735" : userId;
@@ -227,7 +219,6 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
-  // ✅ Barcha ma'lumotlarni yangilash
   const refreshUser = async () => {
     if (user?.id) {
       console.log("🔄 Refreshing all data...");
@@ -244,14 +235,30 @@ export const TelegramProvider = ({ children }) => {
 
     if (tg) {
       console.log("✅ Telegram WebApp found");
-       telegram.ready();
-    telegram.expand();
-    telegram.requestFullscreen();
-    telegram.disableVerticalSwipes();
-    telegram.MainButton.hide();
+      
+      // 🔥 TO'LIQ EKRAN REJIMI
+      tg.ready();
+      tg.expand();
+      tg.enableClosingConfirmation();
+      
+      // 🔥 Viewport sozlamalari
+      if (tg.setHeaderColor) {
+        tg.setHeaderColor('secondary_bg_color');
+      }
+      if (tg.setBackgroundColor) {
+        tg.setBackgroundColor('#ffffff');
+      }
+      
+      // 🔥 Har doim to'liq ekranda bo'lishi uchun
+      const expandInterval = setInterval(() => {
+        if (tg.viewportHeight < window.innerHeight) {
+          tg.expand();
+        }
+      }, 100);
 
-      // 🔒 VIEWPORT LOCK
+      // 🔒 VIEWPORT LOCK - Har qanday o'zgarishda expand qilish
       tg.onEvent("viewportChanged", () => {
+        console.log("📱 Viewport changed, expanding...");
         tg.expand();
       });
 
@@ -303,6 +310,7 @@ export const TelegramProvider = ({ children }) => {
 
       return () => {
         clearInterval(interval);
+        clearInterval(expandInterval);
         clearTimeout(timeout);
       };
     }
@@ -317,7 +325,7 @@ export const TelegramProvider = ({ children }) => {
         payments,
         loading,
         createOrder,
-        createPremiumOrder, // ✅ Premium order funksiyasi
+        createPremiumOrder,
         refreshUser,
       }}
     >
