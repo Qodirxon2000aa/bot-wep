@@ -15,11 +15,11 @@ export const TelegramProvider = ({ children }) => {
       setLoading(true);
       const actualUserId = !isTelegram ? "7521806735" : userId;
       const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${actualUserId}`;
-     
+
       console.log("=== API Fetch Start ===");
       console.log("🌐 URL:", fetchUrl);
       console.log("🆔 User ID:", actualUserId);
-      
+
       const res = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
@@ -28,25 +28,24 @@ export const TelegramProvider = ({ children }) => {
         mode: 'cors',
         cache: 'no-cache',
       });
-      
+
       console.log("📥 Response:", res.status, res.ok);
-      
+
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
-      
+
       const text = await res.text();
       console.log("📄 Raw:", text.substring(0, 200));
-      
+
       const response = JSON.parse(text);
-      
+
       if (response.ok) {
         const userData = {
           balance: response.data?.balance || "0",
           profile: response.data?.profile || null,
           ...response.data,
         };
-       
         console.log("✅ Balance:", userData.balance);
         setApiUser(userData);
         return userData;
@@ -72,9 +71,9 @@ export const TelegramProvider = ({ children }) => {
     try {
       const actualUserId = !isTelegram ? "7521806735" : userId;
       const url = `https://m4746.myxvest.ru/webapp/history.php?user_id=${actualUserId}`;
-      
+
       console.log("📦 Fetching orders from:", url);
-      
+
       const res = await fetch(url, {
         method: 'GET',
         headers: {
@@ -83,14 +82,14 @@ export const TelegramProvider = ({ children }) => {
         mode: 'cors',
         cache: 'no-cache',
       });
-      
+
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
-      
+
       const data = await res.json();
       console.log("📦 Orders response:", data);
-      
+
       if (data.ok && Array.isArray(data.orders)) {
         setOrders(data.orders);
         console.log("✅ Orders loaded:", data.orders.length);
@@ -104,60 +103,101 @@ export const TelegramProvider = ({ children }) => {
     }
   };
 
-  // 🔥 ORDER YUBORISH (Stars, Premium va h.k.)
-const createOrder = async ({ amount, sent, type, overall }) => {
-  try {
-    if (!user?.id) {
-      throw new Error("User ID yo‘q");
+  // 🔥 PREMIUM ORDER YUBORISH - TUZATILGAN
+  const createPremiumOrder = async ({ months, sent, overall }) => {
+    try {
+      if (!user?.id) {
+        throw new Error("User ID yo'q");
+      }
+
+      const actualUserId = user.isTelegram ? user.id : "7521806735";
+      
+      // 🔥 TUZATISH: API "amount" parametrini kutmoqda (3, 6 yoki 12)
+      const url = `https://m4746.myxvest.ru/webapp/premium.php` +
+        `?user_id=${actualUserId}` +
+        `&amount=${months}` + // ✅ Bu to'g'ri (3, 6 yoki 12)
+        `&sent=${sent.replace("@", "")}` +
+        `&overall=${overall}`;
+
+      console.log("💎 PREMIUM ORDER URL:", url);
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      const data = await res.json();
+      console.log("💎 PREMIUM ORDER RESPONSE:", data);
+
+      if (data.ok) {
+        // 🔄 order yuborilgach hammasini yangilaymiz
+        await refreshUser();
+        return {
+          ok: true,
+          data: data.data,
+          order_id: data.order_id,
+          balance_after: data.balance_after
+        };
+      }
+
+      return { ok: false, message: data.message || "Order saqlanmadi" };
+    } catch (err) {
+      console.error("❌ createPremiumOrder error:", err.message);
+      return { ok: false, message: err.message };
     }
+  };
 
-    const actualUserId = user.isTelegram ? user.id : "7521806735";
+  // 🔥 ORDER YUBORISH (Stars va boshqa turlar uchun)
+  const createOrder = async ({ amount, sent, type, overall }) => {
+    try {
+      if (!user?.id) {
+        throw new Error("User ID yo'q");
+      }
 
-    const url =
-      `https://m4746.myxvest.ru/webapp/order.php` +
-      `?user_id=${actualUserId}` +
-      `&amount=${amount}` +
-      `&sent=@${sent.replace("@", "")}` +
-      `&type=${type}` +
-      `&overall=${overall}`;
+      const actualUserId = user.isTelegram ? user.id : "7521806735";
 
-    console.log("📤 ORDER URL:", url);
+      const url = `https://m4746.myxvest.ru/webapp/order.php` +
+        `?user_id=${actualUserId}` +
+        `&amount=${amount}` +
+        `&sent=@${sent.replace("@", "")}` +
+        `&type=${type}` +
+        `&overall=${overall}`;
 
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    });
+      console.log("📤 ORDER URL:", url);
 
-    const data = await res.json();
-    console.log("📥 ORDER RESPONSE:", data);
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
 
-    if (data.ok) {
-      // 🔄 order yuborilgach hammasini yangilaymiz
-      await refreshUser();
-      return { ok: true };
+      const data = await res.json();
+      console.log("📥 ORDER RESPONSE:", data);
+
+      if (data.ok) {
+        // 🔄 order yuborilgach hammasini yangilaymiz
+        await refreshUser();
+        return { ok: true };
+      }
+
+      return { ok: false, message: "Order saqlanmadi" };
+    } catch (err) {
+      console.error("❌ createOrder error:", err.message);
+      return { ok: false, message: err.message };
     }
-
-    return { ok: false, message: "Order saqlanmadi" };
-  } catch (err) {
-    console.error("❌ createOrder error:", err.message);
-    return { ok: false, message: err.message };
-  }
-};
-
-
-
-
+  };
 
   // ✅ Payments tarixini olish
   const fetchPayments = async (userId, isTelegram = true) => {
     try {
       const actualUserId = !isTelegram ? "7521806735" : userId;
       const url = `https://m4746.myxvest.ru/webapp/payments.php?user_id=${actualUserId}`;
-      
+
       console.log("💳 Fetching payments from:", url);
-      
+
       const res = await fetch(url, {
         method: 'GET',
         headers: {
@@ -166,14 +206,14 @@ const createOrder = async ({ amount, sent, type, overall }) => {
         mode: 'cors',
         cache: 'no-cache',
       });
-      
+
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
-      
+
       const data = await res.json();
       console.log("💳 Payments response:", data);
-      
+
       if (data.ok && Array.isArray(data.payments)) {
         setPayments(data.payments);
         console.log("✅ Payments loaded:", data.payments.length);
@@ -199,85 +239,83 @@ const createOrder = async ({ amount, sent, type, overall }) => {
     }
   };
 
- useEffect(() => {
-  const tg = window.Telegram?.WebApp;
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
 
-  if (tg) {
-    console.log("✅ Telegram WebApp found");
-
-    tg.ready();
-    tg.expand();
-
-    // 🔒 VIEWPORT LOCK
-    tg.onEvent("viewportChanged", () => {
+    if (tg) {
+      console.log("✅ Telegram WebApp found");
+      tg.ready();
       tg.expand();
-    });
 
-    let interval;
-    let timeout;
+      // 🔒 VIEWPORT LOCK
+      tg.onEvent("viewportChanged", () => {
+        tg.expand();
+      });
 
-    interval = setInterval(() => {
-      const tgUser = tg.initDataUnsafe?.user;
-      if (tgUser?.id) {
+      let interval;
+      let timeout;
+
+      interval = setInterval(() => {
+        const tgUser = tg.initDataUnsafe?.user;
+
+        if (tgUser?.id) {
+          clearInterval(interval);
+          clearTimeout(timeout);
+
+          const baseUser = {
+            id: tgUser.id,
+            first_name: tgUser.first_name || "",
+            last_name: tgUser.last_name || "",
+            username: tgUser.username ? `@${tgUser.username}` : "",
+            language_code: tgUser.language_code || "en",
+            isTelegram: true,
+            photo_url: tgUser.photo_url || null,
+          };
+
+          setUser(baseUser);
+          fetchUserFromApi(tgUser.id, true);
+          fetchOrders(tgUser.id, true);
+          fetchPayments(tgUser.id, true);
+        }
+      }, 300);
+
+      timeout = setTimeout(() => {
         clearInterval(interval);
-        clearTimeout(timeout);
 
-        const baseUser = {
-          id: tgUser.id,
-          first_name: tgUser.first_name || "",
-          last_name: tgUser.last_name || "",
-          username: tgUser.username ? `@${tgUser.username}` : "",
-          language_code: tgUser.language_code || "en",
-          isTelegram: true,
-          photo_url: tgUser.photo_url || null,
+        const devUser = {
+          id: "DEV_123456",
+          first_name: "Dev",
+          last_name: "User",
+          username: "@dev_user",
+          language_code: "uz",
+          isTelegram: false,
+          photo_url: null,
         };
 
-        setUser(baseUser);
+        setUser(devUser);
+        fetchUserFromApi(devUser.id, false);
+        fetchOrders(devUser.id, false);
+        fetchPayments(devUser.id, false);
+      }, 3000);
 
-        fetchUserFromApi(tgUser.id, true);
-        fetchOrders(tgUser.id, true);
-        fetchPayments(tgUser.id, true);
-      }
-    }, 300);
-
-    timeout = setTimeout(() => {
-      clearInterval(interval);
-
-      const devUser = {
-        id: "DEV_123456",
-        first_name: "Dev",
-        last_name: "User",
-        username: "@dev_user",
-        language_code: "uz",
-        isTelegram: false,
-        photo_url: null,
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
       };
-
-      setUser(devUser);
-      fetchUserFromApi(devUser.id, false);
-      fetchOrders(devUser.id, false);
-      fetchPayments(devUser.id, false);
-    }, 3000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }
-}, []);
-
+    }
+  }, []);
 
   return (
     <TelegramContext.Provider
       value={{
         user,
-    apiUser,
-    orders,
-    payments,
-    loading,
-    refreshUser,
-    createOrder, // 🔥 QO‘SHILDI
-    tg: window.Telegram?.WebApp,
+        apiUser,
+        orders,
+        payments,
+        loading,
+        createOrder,
+        createPremiumOrder, // ✅ Premium order funksiyasi
+        refreshUser,
       }}
     >
       {children}

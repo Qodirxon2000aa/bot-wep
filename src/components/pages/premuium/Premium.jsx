@@ -3,7 +3,7 @@ import { useTelegram } from "../../../../context/TelegramContext";
 import "./premium.css";
 
 const PremiumModal = ({ onClose }) => {
-  const { createOrder, apiUser, user } = useTelegram();
+  const { createPremiumOrder, apiUser, user } = useTelegram(); // 🔥 createPremiumOrder ishlatamiz
   const [username, setUsername] = useState("");
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [sending, setSending] = useState(false);
@@ -13,8 +13,6 @@ const PremiumModal = ({ onClose }) => {
   const [validationError, setValidationError] = useState("");
 
   const image = "https://media.istockphoto.com/id/2150568832/vector/telegram-premium-messenger-account-icon-flying-star-badge-top-rated-profile.jpg?s=612x612&w=0&k=20&c=kT83Oy1iN23R1T8gyBXS2v2fv-xuvmT5ZhxJg55MzfE=";
-
-
 
   const plans = [
     { 
@@ -68,25 +66,28 @@ const PremiumModal = ({ onClose }) => {
     setError(false);
 
     try {
-      const result = await createOrder({
-        amount: selectedPlan.id,
+      // 🔥 YANGI PREMIUM API ISHLATILMOQDA
+      const result = await createPremiumOrder({
+        months: selectedPlan.id, // 3, 6 yoki 12
         sent: username,
-        type: "Premium",
         overall: totalPrice,
       });
 
       if (result.ok) {
+        console.log("✅ Premium order created:", result);
         setTimeout(() => {
           setSending(false);
           setSuccess(true);
         }, 1000);
       } else {
+        console.error("❌ Premium order failed:", result.message);
         setTimeout(() => {
           setSending(false);
           setError(true);
         }, 800);
       }
     } catch (err) {
+      console.error("❌ Premium order error:", err);
       setTimeout(() => {
         setSending(false);
         setError(true);
@@ -202,7 +203,7 @@ const PremiumModal = ({ onClose }) => {
         {!sending && !success && !error && !insufficientFunds && !validationError && (
           <>
             <h2>💎 Telegram Premium</h2>
-
+            <br />
             <div className="balance-info">
               Hisobingiz: <strong>{balance} UZS</strong>
             </div>
