@@ -12,24 +12,28 @@ const PremiumModal = ({ onClose }) => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
   const [validationError, setValidationError] = useState("");
 
+  const image = "https://media.istockphoto.com/id/2150568832/vector/telegram-premium-messenger-account-icon-flying-star-badge-top-rated-profile.jpg?s=612x612&w=0&k=20&c=kT83Oy1iN23R1T8gyBXS2v2fv-xuvmT5ZhxJg55MzfE=";
+
+
+
   const plans = [
     { 
       id: 3, 
       label: "3 OYLIK", 
       price: 165000,
-      img: "https://media.istockphoto.com/id/2150568832/vector/telegram-premium-messenger-account-icon-flying-star-badge-top-rated-profile.jpg?s=612x612&w=0&k=20&c=kT83Oy1iN23R1T8gyBXS2v2fv-xuvmT5ZhxJg55MzfE=" 
+      img: image 
     },
     { 
       id: 6, 
       label: "6 OYLIK", 
       price: 225000,
-      img: "https://media.istockphoto.com/id/2150568832/vector/telegram-premium-messenger-account-icon-flying-star-badge-top-rated-profile.jpg?s=612x612&w=0&k=20&c=kT83Oy1iN23R1T8gyBXS2v2fv-xuvmT5ZhxJg55MzfE=" 
+      img: image 
     },
     { 
       id: 12, 
       label: "12 OYLIK", 
       price: 295000,
-      img: "https://media.istockphoto.com/id/2150568832/vector/telegram-premium-messenger-account-icon-flying-star-badge-top-rated-profile.jpg?s=612x612&w=0&k=20&c=kT83Oy1iN23R1T8gyBXS2v2fv-xuvmT5ZhxJg55MzfE=" 
+      img: image 
     },
   ];
 
