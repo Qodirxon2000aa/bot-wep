@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useTelegram } from "../../../../context/TelegramContext";
 import "./premium.css";
+import image from "../../../assets/prem.ico";
+
 
 const PremiumModal = ({ onClose }) => {
   const { createPremiumOrder, apiUser, user } = useTelegram(); // 🔥 createPremiumOrder ishlatamiz
@@ -12,8 +14,7 @@ const PremiumModal = ({ onClose }) => {
   const [insufficientFunds, setInsufficientFunds] = useState(false);
   const [validationError, setValidationError] = useState("");
 
-  const image = "https://media.istockphoto.com/id/2150568832/vector/telegram-premium-messenger-account-icon-flying-star-badge-top-rated-profile.jpg?s=612x612&w=0&k=20&c=kT83Oy1iN23R1T8gyBXS2v2fv-xuvmT5ZhxJg55MzfE=";
-
+  
   const plans = [
     { 
       id: 3, 
