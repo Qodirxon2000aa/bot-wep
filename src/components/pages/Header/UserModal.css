@@ -42,6 +42,18 @@
   to { opacity: 1 }
 }
 
+/* ==================== COPY ALERT ANIMATION ==================== */
+@keyframes slideDown {
+  from {
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
 /* ==================== MODAL ==================== */
 .user-modal {
   width: 100%;
@@ -196,7 +208,7 @@
 }
 
 .user-row-details.expanded {
-  max-height: 160px;
+  max-height: 400px;
   opacity: 1;
   padding: 16px;
 }
@@ -277,5 +289,3 @@
   text-align: left;
   justify-content: flex-start;
 }
-
-/* Row detail container */
