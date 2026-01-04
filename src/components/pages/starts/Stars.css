@@ -55,7 +55,8 @@
 }
 
 /* Close Button */
-.modal-close {
+.modal-close,
+.modal-close-status {
   position: absolute;
   top: 16px;
   right: 16px;
@@ -74,7 +75,8 @@
   z-index: 10;
 }
 
-.modal-close:hover {
+.modal-close:hover,
+.modal-close-status:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: rotate(90deg);
 }

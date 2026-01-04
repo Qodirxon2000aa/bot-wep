@@ -12,6 +12,7 @@ const StarsModal = ({ onClose }) => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [insufficientFunds, setInsufficientFunds] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
   useEffect(() => {
     fetch("https://m4746.myxvest.ru/webapp/settings.php")
@@ -34,17 +35,18 @@ const StarsModal = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    if (!username.trim()) return alert("Username kiriting");
+    if (!username.trim()) {
+      setValidationError("Username kiriting");
+      return;
+    }
     if (amount < 50 || amount > 500000) {
-      return alert("Stars 50 — 500000 oralig'ida bo'lishi kerak");
+      setValidationError("Stars 50 — 500000 oralig'ida bo'lishi kerak");
+      return;
     }
 
     const userBalance = Number(apiUser?.balance || 0);
     if (userBalance < totalPrice) {
       setInsufficientFunds(true);
-      setTimeout(() => {
-        setInsufficientFunds(false);
-      }, 3000);
       return;
     }
 
@@ -64,26 +66,17 @@ const StarsModal = ({ onClose }) => {
         setTimeout(() => {
           setSending(false);
           setSuccess(true);
-          setTimeout(() => {
-            onClose();
-          }, 1800);
         }, 1000);
       } else {
         setTimeout(() => {
           setSending(false);
           setError(true);
-          setTimeout(() => {
-            onClose();
-          }, 1800);
         }, 800);
       }
     } catch (err) {
       setTimeout(() => {
         setSending(false);
         setError(true);
-        setTimeout(() => {
-          onClose();
-        }, 1800);
       }, 800);
     }
   };
@@ -91,7 +84,7 @@ const StarsModal = ({ onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {!sending && !success && (
+        {!sending && !success && !error && !insufficientFunds && !validationError && (
           <button className="modal-close" onClick={onClose}>
             ✕
           </button>
@@ -106,6 +99,9 @@ const StarsModal = ({ onClose }) => {
 
         {success && (
           <div className="modal-status success">
+            <button className="modal-close-status" onClick={() => setSuccess(false)}>
+              ✕
+            </button>
             <div className="success-icon">✓</div>
             <h3>Muvaffaqiyatli!</h3>
             <p>Stars muvaffaqiyatli sotib olindi</p>
@@ -114,6 +110,9 @@ const StarsModal = ({ onClose }) => {
 
         {error && (
           <div className="modal-status error">
+            <button className="modal-close-status" onClick={() => setError(false)}>
+              ✕
+            </button>
             <div className="error-icon">✕</div>
             <h3>Muvaffaqiyatsiz</h3>
             <p>Buyurtma saqlanmadi</p>
@@ -123,6 +122,9 @@ const StarsModal = ({ onClose }) => {
         {/* 💸 INSUFFICIENT FUNDS */}
         {insufficientFunds && (
           <div className="modal-status insufficient">
+            <button className="modal-close-status" onClick={() => setInsufficientFunds(false)}>
+              ✕
+            </button>
             <div className="insufficient-animation">
               <div className="wallet-empty">
                 <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
@@ -159,7 +161,27 @@ const StarsModal = ({ onClose }) => {
           </div>
         )}
 
-        {!sending && !success && !error && !insufficientFunds && (
+        {/* ⚠️ VALIDATION ERROR */}
+        {validationError && (
+          <div className="modal-status validation-error">
+            <button className="modal-close-status" onClick={() => setValidationError("")}>
+              ✕
+            </button>
+            <div className="validation-animation">
+              <div className="warning-shake">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="12" cy="17" r="1" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+            <h3>Diqqat!</h3>
+            <p>{validationError}</p>
+          </div>
+        )}
+
+        {!sending && !success && !error && !insufficientFunds && !validationError && (
           <>
             <h2 className="modal-title">⭐ Stars Xaridi</h2>
             <div className="balance-info">

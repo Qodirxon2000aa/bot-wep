@@ -13,7 +13,7 @@ body {
 
 .dashboard {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #ff8a00, #e52e71, #9c27b0, #6a1b9a);
+  background: #1A2026;
   padding: 15px;
   position: relative;
   overflow-x: hidden;
@@ -103,7 +103,7 @@ body {
   gap: 15px;
   font-size: 18px;
   font-weight: 700;
-  box-shadow: 0 12px 30px rgba(0, 212, 255, 0.5);
+  /* box-shadow: 0 12px 30px rgba(0, 212, 255, 0.5); */
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 }
@@ -147,7 +147,7 @@ body {
   gap: 15px;
   font-size: 18px;
   font-weight: 700;
-  box-shadow: 0 12px 30px rgba(0, 212, 255, 0.5);
+  /* box-shadow: 0 12px 30px rgba(0, 212, 255, 0.5); */
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   padding: 0 30px;
