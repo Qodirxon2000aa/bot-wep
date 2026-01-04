@@ -116,7 +116,7 @@ const Money = ({ onClose }) => {
         console.log(`[Payment Check] Tekshirilmoqda... (payment_id: ${pid})`);
 
         const res = await fetch(
-          `https://m4746.myxvest.ru/webapp/payments/pay_status.php?payment_id=${pid}`,
+          `https://m4746.myxvest.ru/webapp/payments/status.php?payment_id=${pid}`,
           { method: "GET", headers: { Accept: "application/json" } }
         );
 
