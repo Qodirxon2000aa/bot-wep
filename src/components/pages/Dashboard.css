@@ -134,13 +134,13 @@ body {
 }
 .gifts-btn {
   margin-top: 15px;
-  width: 100%;
+  width: 95%;
   background: linear-gradient(135deg, #ff00c3, #ff5e7e);
   max-width: 500px;
   margin: 30px auto;
   color: white;
   border-radius: 50px;
-  height: 70px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -204,7 +204,8 @@ body {
   }
 
   .share-btn {
-    height: 65px;
+    width: 95%;
+    height: 60px;
     font-size: 17px;
     padding: 0 20px;
   }
