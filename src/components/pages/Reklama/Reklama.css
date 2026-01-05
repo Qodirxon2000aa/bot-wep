@@ -1,8 +1,8 @@
 .reklama-carousel {
   width: 100%;
-  max-width: 500px;
-  overflow: hidden;
-  margin-top: -20px;
+  max-width: 100%;
+  overflow: hidden; /* 🔒 MUHIM */
+  margin-top: 20px;
   margin-bottom: 10px;
   border-radius: 25px;
   position: relative;
@@ -11,20 +11,22 @@
 .carousel-track {
   display: flex;
   transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .reklama-slide {
   flex: 0 0 100%;
-  padding: 18px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
+  padding: 0 12px; /* ❗ kichraytirildi */
 }
 
+/* 🖼 RASM */
 .ad-image-wrapper {
   display: block;
-  width: 320px;
-  overflow: hidden;
+  width: 100%;        /* 🔥 100% */
+  max-width: 360px;   /* desktop uchun */
   height: 150px;
   border-radius: 22px;
   overflow: hidden;
@@ -34,32 +36,71 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: 0.4s ease;
+  display: block;
+  transition: transform 0.4s ease;
 }
 
 .ad-image-wrapper:hover img {
   transform: scale(1.05);
 }
 
+/* ● DOTS */
 .carousel-dots {
   position: absolute;
-  bottom: 4px;
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
+  z-index: 5;
 }
 
 .dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.4);
   transition: 0.25s;
   cursor: pointer;
+  margin-top: 0px;
 }
 
 .dot.active {
   background: white;
   transform: scale(1.3);
+}
+
+/* ===================== */
+/* 📱 MOBIL (phones) */
+/* ===================== */
+@media (max-width: 480px) {
+  .reklama-slide {
+    padding: 0 8px;
+  }
+
+  .ad-image-wrapper {
+    max-width: 100%;
+    height: 140px;
+    border-radius: 18px;
+  }
+}
+
+/* ===================== */
+/* 📱 TABLET */
+/* ===================== */
+@media (max-width: 768px) {
+  .ad-image-wrapper {
+    max-width: 100%;
+    height: 150px;
+  }
+}
+
+/* ===================== */
+/* 🖥 KATTA EKRAN */
+/* ===================== */
+@media (min-width: 1024px) {
+  .ad-image-wrapper {
+    max-width: 420px;
+    height: 170px;
+  }
 }

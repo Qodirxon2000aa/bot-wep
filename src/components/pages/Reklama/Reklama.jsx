@@ -2,20 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import "./Reklama.css";
 import image from "../../../assets/b1.jpg"
 import image2 from "../../../assets/b2.jpg"
+import main from "../../../assets/main.jpg"
 const ads = [
   {
     id: 1,
-    image: image, // 🔗 o'zing rasm qo'yasan
+    image: main, // 🔗 o'zing rasm qo'yasan
     link: "#", // 🔗 o'zing link qo'yasan
   },
   {
     id: 2,
-    image: image2,
+    image: image,
     link: "#",
   },
   {
     id: 3,
-    image: image,
+    image: image2,
     link: "#",
   },
 ];
