@@ -1,5 +1,5 @@
 // Gifts.jsx
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,8 +9,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/effect-coverflow";
 import "./Gifts.css";
-
-import Dashboard from "../Dashboard.jsx";
 
 import Header from "../../pages/Header/Header.jsx";
 
@@ -41,6 +39,8 @@ const gifts = [
 
 const Gifts = () => {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const demoUser = {
     name: "John Doe",
@@ -50,21 +50,44 @@ const Gifts = () => {
   const storedUser = localStorage.getItem("userData");
   const user = storedUser ? JSON.parse(storedUser) : demoUser;
 
+  const handleBuyClick = () => {
+    setShowModal(true);
+    setIsClosing(false);
+
+    // 3 sekunddan keyin yopilishni boshlaymiz
+    setTimeout(() => {
+      setIsClosing(true);
+      // Animatsiya tugaguncha kutib, keyin modalni butunlay yopamiz
+      setTimeout(() => {
+        setShowModal(false);
+      }, 300);
+    }, 3000);
+  };
+
   return (
     <div className="gifts-page">
-
-      {/* Header sahifa tepasida chiqishi */}
+      {/* Header */}
       <Header user={user} />
 
       {/* Back Button */}
-     <div className="back-btn" onClick={() => navigate("/dashboard")}>
-  <img src={BackIcon} alt="back"/>
-  <span>Orqaga</span>
-</div>
+      <div className="back-btn" onClick={() => navigate("/dashboard")}>
+        <img src={BackIcon} alt="back" />
+        <span>Orqaga</span>
+      </div>
 
+      {/* YANGI MODAL – Ekranning markazida */}
+      {showModal && (
+        <div className={`modal-overlay ${isClosing ? "modal-closing" : ""}`}>
+          <div className={`modal-content ${isClosing ? "modal-closing" : ""}`}>
+            <h3>Tez kunda...</h3>
+            <p>Sotib olish funksiyasi tez orada qo'shiladi!🌟</p>
+          </div>
+        </div>
+      )}
 
+      {/* Slider */}
       <div className="gifts-slider-container">
-        <h2 className="slider-title">Sovg‘alar</h2>
+        <h2 className="slider-title">Sovg'alar</h2>
 
         <Swiper
           modules={[Navigation, Autoplay, EffectCoverflow]}
@@ -96,7 +119,9 @@ const Gifts = () => {
                 <img src={gift.img} alt={`Gift ${index + 1}`} />
                 <h4 className="stars">{gift.stars} stars</h4>
                 <h4 className="price">{gift.price}</h4>
-                <button className="buy-btn">Sotib olish</button>
+                <button className="buy-btn" onClick={handleBuyClick}>
+                  Sotib olish
+                </button>
               </div>
             </SwiperSlide>
           ))}
