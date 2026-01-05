@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Reklama.css";
 import image from "../../../assets/b1.jpg"
+import image2 from "../../../assets/b2.jpg"
 const ads = [
   {
     id: 1,
@@ -9,7 +10,7 @@ const ads = [
   },
   {
     id: 2,
-    image: image,
+    image: image2,
     link: "#",
   },
   {

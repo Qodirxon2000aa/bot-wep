@@ -23,7 +23,8 @@
 
 .ad-image-wrapper {
   display: block;
-  width: 330px;
+  width: 320px;
+  overflow: hidden;
   height: 150px;
   border-radius: 22px;
   overflow: hidden;
