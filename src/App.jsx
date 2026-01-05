@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Dashboard from "./components/pages/Dashboard";
 import Gifts from "./components/pages/Gifts/Gifts";
 import { TelegramProvider } from "../context/TelegramContext";
+import YandexTracker from "./../YandexTracker"; // 🔥 NEW
 
 function App() {
   return (
     <TelegramProvider>
       <Router>
+        <YandexTracker /> {/* 🔥 MUHIM */}
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
