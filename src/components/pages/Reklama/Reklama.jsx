@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./Reklama.css";
-import image from "../../../assets/b1.jpg"
-import image2 from "../../../assets/b2.jpg"
-import main from "../../../assets/main.jpg"
+
+import image from "../../../assets/b1.jpg";
+import image2 from "../../../assets/b2.jpg";
+import main from "../../../assets/main.jpg";
+
 const ads = [
   {
     id: 1,
-    image: main, // 🔗 o'zing rasm qo'yasan
-    link: "#", // 🔗 o'zing link qo'yasan
+    image: main,
+    link: "#",
   },
   {
     id: 2,
     image: image,
-    link: "#",
+    link: "https://t.me/m/5SXmspSYMmQy", // ✅ FAQAT SHU OCHILADI
   },
   {
     id: 3,
@@ -30,7 +32,6 @@ const Reklama = () => {
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % ads.length);
     }, 6000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -67,6 +68,13 @@ const Reklama = () => {
     };
   }, []);
 
+  const handleClick = (ad, e) => {
+    if (ad.id === 2 && ad.link && window.Telegram?.WebApp) {
+      e.preventDefault();
+      window.Telegram.WebApp.openLink(ad.link);
+    }
+  };
+
   return (
     <div className="reklama-carousel" ref={carouselRef}>
       <div
@@ -75,7 +83,11 @@ const Reklama = () => {
       >
         {ads.map((ad) => (
           <div key={ad.id} className="reklama-slide">
-            <a href={ad.link} className="ad-image-wrapper">
+            <a
+              href={ad.link}
+              className="ad-image-wrapper"
+              onClick={(e) => handleClick(ad, e)}
+            >
               <img src={ad.image} alt="reklama" />
             </a>
           </div>
