@@ -80,6 +80,7 @@ const Reklama = ({ onOpenStarsModal }) => {
   };
 
   return (
+    
     <div className="reklama-carousel" ref={carouselRef}>
       <div
         className="carousel-track"
@@ -104,8 +105,7 @@ const Reklama = ({ onOpenStarsModal }) => {
           </div>
         ))}
       </div>
-
-      {/* Nuqtalar — pastda */}
+         {/* Nuqtalar — pastda */}
       <div className="carousel-dots">
         {ads.map((_, i) => (
           <span
@@ -115,7 +115,10 @@ const Reklama = ({ onOpenStarsModal }) => {
           />
         ))}
       </div>
+
     </div>
+
+
   );
 };
 
