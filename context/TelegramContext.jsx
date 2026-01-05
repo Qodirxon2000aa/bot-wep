@@ -13,7 +13,7 @@ export const TelegramProvider = ({ children }) => {
     try {
       setLoading(true);
       const actualUserId = !isTelegram ? "7521806735" : userId;
-      const fetchUrl = `https://m4746.myxvest.ru/webapp/get_user.php?user_id=${actualUserId}`;
+      const fetchUrl = `https://tezpremium.uz/webapp/get_user.php?user_id=${actualUserId}`;
 
       console.log("=== API Fetch Start ===");
       console.log("🌐 URL:", fetchUrl);
@@ -68,7 +68,7 @@ export const TelegramProvider = ({ children }) => {
   const fetchOrders = async (userId, isTelegram = true) => {
     try {
       const actualUserId = !isTelegram ? "7521806735" : userId;
-      const url = `https://m4746.myxvest.ru/webapp/history.php?user_id=${actualUserId}`;
+      const url = `https://tezpremium.uz/webapp/history.php?user_id=${actualUserId}`;
 
       console.log("📦 Fetching orders from:", url);
 
@@ -109,7 +109,7 @@ export const TelegramProvider = ({ children }) => {
 
       const actualUserId = user.isTelegram ? user.id : "7521806735";
       
-      const url = `https://m4746.myxvest.ru/webapp/premium.php` +
+      const url = `https://tezpremium.uz/webapp/premium.php` +
         `?user_id=${actualUserId}` +
         `&amount=${months}` +
         `&sent=${sent.replace("@", "")}` +
@@ -152,7 +152,7 @@ export const TelegramProvider = ({ children }) => {
 
       const actualUserId = user.isTelegram ? user.id : "7521806735";
 
-      const url = `https://m4746.myxvest.ru/webapp/order.php` +
+      const url = `https://tezpremium.uz/webapp/order.php` +
         `?user_id=${actualUserId}` +
         `&amount=${amount}` +
         `&sent=@${sent.replace("@", "")}` +
@@ -186,7 +186,7 @@ export const TelegramProvider = ({ children }) => {
   const fetchPayments = async (userId, isTelegram = true) => {
     try {
       const actualUserId = !isTelegram ? "7521806735" : userId;
-      const url = `https://m4746.myxvest.ru/webapp/payments.php?user_id=${actualUserId}`;
+      const url = `https://tezpremium.uz/webapp/payments.php?user_id=${actualUserId}`;
 
       console.log("💳 Fetching payments from:", url);
 
