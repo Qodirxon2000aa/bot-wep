@@ -1,11 +1,6 @@
-/* ==================== HEADER ASOSIY QISMI ==================== */
 .header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  margin-bottom: 24px;
-  animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideDown {
@@ -35,9 +30,7 @@
   color: white;
   font-weight: 700;
   font-size: 17px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.18);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
@@ -59,21 +52,16 @@
 
 .balance:hover {
   transform: translateY(-2px);
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* ==================== PROFILE ICON ==================== */
 .profile-icon {
   width: 56px;
   height: 56px;
   background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 
-    0 10px 25px rgba(102, 126, 234, 0.35),
-    inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.35), inset 0 -2px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
@@ -92,9 +80,7 @@
 
 .profile-icon:hover {
   transform: scale(1.08) rotate(5deg);
-  box-shadow: 
-    0 15px 35px rgba(102, 126, 234, 0.5),
-    inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5), inset 0 -2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .profile-icon:hover::before {
@@ -123,7 +109,6 @@
   transform: scale(1.1);
 }
 
-/* ==================== MONEY CONTAINER ==================== */
 .money {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   color: #1a1a2e;
@@ -137,14 +122,11 @@
   font-weight: 800;
   font-size: 18px;
   flex-shrink: 0;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   letter-spacing: 0.3px;
 }
 
-/* ==================== PLUS TUGMASI — PREMIUM STYLE ==================== */
 .plus {
   width: 38px;
   height: 38px;
@@ -156,10 +138,7 @@
   justify-content: center;
   font-size: 24px;
   font-weight: 900;
-  box-shadow: 
-    0 6px 20px rgba(255, 215, 0, 0.4),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.7);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -196,10 +175,7 @@
 
 .plus:hover {
   transform: scale(1.18) rotate(-8deg);
-  box-shadow: 
-    0 10px 30px rgba(255, 215, 0, 0.6),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6), inset 0 -2px 4px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
 .plus:hover::before {
@@ -213,12 +189,9 @@
 
 .plus:active {
   transform: scale(1.08) rotate(-8deg);
-  box-shadow: 
-    0 5px 15px rgba(255, 215, 0, 0.4),
-    inset 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4), inset 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* ==================== MODAL — ZAMONAVIY GLASSMORPHISM ==================== */
 .user-modal-overlay {
   position: fixed;
   inset: 0;
@@ -244,32 +217,26 @@
   }
 }
 
-/* ==================== RESPONSIVE ==================== */
 @media (min-width: 768px) {
   .user-modal-overlay {
     align-items: center;
   }
-  
   .header {
     padding: 20px 24px;
   }
-  
   .balance {
     max-width: 460px;
     padding: 10px;
   }
-  
   .profile-icon {
     width: 60px;
     height: 60px;
   }
-  
   .money {
     height: 52px;
     min-width: 150px;
     font-size: 19px;
   }
-  
   .plus {
     width: 40px;
     height: 40px;
@@ -281,18 +248,15 @@
   .balance {
     padding: 6px;
   }
-  
   .profile-icon {
     width: 50px;
     height: 50px;
   }
-  
   .money {
     height: 44px;
     min-width: 120px;
     font-size: 16px;
   }
-  
   .plus {
     width: 36px;
     height: 36px;
@@ -300,7 +264,6 @@
   }
 }
 
-/* ==================== LOADING ANIMATION ==================== */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
