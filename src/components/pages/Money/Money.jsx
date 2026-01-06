@@ -24,19 +24,28 @@ const Money = ({ onClose }) => {
   const [payStatus, setPayStatus] = useState(null);
   const [showPaymentDisabled, setShowPaymentDisabled] = useState(false);
 
-  // Pay status tekshirish
+  // Pay status tekshirish - Har 5 sekundda
   useEffect(() => {
     const checkPayStatus = async () => {
       try {
-        const res = await fetch("https://tezpremium.uz/webapp/payments/status_check.php");
+        const res = await fetch("https://tezpremium.uz/webapp/settings.php");
         const data = await res.json();
-        setPayStatus(data.pay_status || "off");
+        const status = data.settings?.pay_status || "off";
+        console.log("Pay status:", status);
+        setPayStatus(status);
       } catch (err) {
         console.error("Pay status tekshirishda xatolik:", err);
         setPayStatus("off");
       }
     };
+    
+    // Darhol tekshirish
     checkPayStatus();
+    
+    // Har 5 sekundda tekshirish
+    const interval = setInterval(checkPayStatus, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Taymer
@@ -228,7 +237,7 @@ const Money = ({ onClose }) => {
             <div className="waiting-spinner"></div>
             <h3>To'lovni yakunlang</h3>
             <p>Kartangizdan to'lovni amalga oshiring</p>
-
+              <p>Belgilangan tolovdan 1 so’m ko’p ham kam ham tashlamang!</p>
             <br />
 
             {/* To'lov summasi ko'rsatish va copy qilish */}
