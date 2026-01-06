@@ -1,4 +1,4 @@
-// pages/Money.jsx - FINAL VERSIYA + TO‘LOV SUMMASI KO‘RSATISH + COPY
+// pages/Money.jsx - TO'LIQ FINAL VERSIYA
 import React, { useState, useEffect } from "react";
 import "./Money.css";
 import { useTelegram } from "../../../../context/TelegramContext";
@@ -19,6 +19,25 @@ const Money = ({ onClose }) => {
   // Natija animatsiyasi
   const [showResult, setShowResult] = useState(false);
   const [resultType, setResultType] = useState("");
+  
+  // Pay status tekshiruvi
+  const [payStatus, setPayStatus] = useState(null);
+  const [showPaymentDisabled, setShowPaymentDisabled] = useState(false);
+
+  // Pay status tekshirish
+  useEffect(() => {
+    const checkPayStatus = async () => {
+      try {
+        const res = await fetch("https://tezpremium.uz/webapp/payments/status_check.php");
+        const data = await res.json();
+        setPayStatus(data.pay_status || "off");
+      } catch (err) {
+        console.error("Pay status tekshirishda xatolik:", err);
+        setPayStatus("off");
+      }
+    };
+    checkPayStatus();
+  }, []);
 
   // Taymer
   useEffect(() => {
@@ -54,7 +73,7 @@ const Money = ({ onClose }) => {
   };
 
   // Xato
-  const handlePaymentError = (msg = "To‘lov bekor qilindi yoki muvaffaqiyatsiz") => {
+  const handlePaymentError = (msg = "To'lov bekor qilindi yoki muvaffaqiyatsiz") => {
     setResultType("error");
     setShowResult(true);
 
@@ -69,9 +88,19 @@ const Money = ({ onClose }) => {
 
   const handleSubmit = async () => {
     setErrorMsg("");
+    
+    // Pay status tekshiruvi
+    if (payStatus === "off") {
+      setShowPaymentDisabled(true);
+      setTimeout(() => {
+        setShowPaymentDisabled(false);
+      }, 3000);
+      return;
+    }
+    
     const numAmount = parseInt(rawAmount, 10);
     if (!numAmount || numAmount < 1000 || numAmount > 10000000) {
-      setErrorMsg("Summa 1 000 — 10 000 000 UZS oralig‘ida bo‘lishi kerak");
+      setErrorMsg("Summa 1 000 — 10 000 000 UZS oralig'ida bo'lishi kerak");
       return;
     }
 
@@ -98,11 +127,11 @@ const Money = ({ onClose }) => {
         setCardInfo(data.card || { number: "9860 1600 0000 1234", owner: "O/I" });
         checkPaymentStatus(data.payment_id);
       } else {
-        setErrorMsg(data.message || "To‘lov yaratishda xatolik");
+        setErrorMsg(data.message || "To'lov yaratishda xatolik");
       }
     } catch (err) {
       console.error(err);
-      setErrorMsg(err.message || "So‘rovda xatolik");
+      setErrorMsg(err.message || "So'rovda xatolik");
     } finally {
       setIsSubmitting(false);
     }
@@ -133,7 +162,7 @@ const Money = ({ onClose }) => {
           handlePaymentSuccess();
         } else if (["failed", "canceled", "expired"].includes(data.status)) {
           clearInterval(interval);
-          handlePaymentError("To‘lov bekor qilindi yoki muvaffaqiyatsiz");
+          handlePaymentError("To'lov bekor qilindi yoki muvaffaqiyatsiz");
         }
       } catch (err) {
         console.error("[Payment Check] Xatolik:", err);
@@ -142,7 +171,7 @@ const Money = ({ onClose }) => {
 
     setTimeout(() => {
       clearInterval(interval);
-      console.log("[Payment Check] 10 daqiqa o‘tdi — to‘xtatildi");
+      console.log("[Payment Check] 10 daqiqa o'tdi — to'xtatildi");
     }, 600000);
   };
 
@@ -158,19 +187,19 @@ const Money = ({ onClose }) => {
       <div className="money-modal" onClick={(e) => e.stopPropagation()}>
         <button className="money-close-btn" onClick={onClose}>×</button>
 
-        <h2 className="money-title">Hisobni to‘ldirish</h2>
+        <h2 className="money-title">Hisobni to'ldirish</h2>
 
         {errorMsg && <div className="error-message">{errorMsg}</div>}
 
         {!waiting ? (
           <>
             <div className="money-method">
-              <label>To‘lov turi</label>
+              <label>To'lov turi</label>
               <div className="method-selected">Karta orqali</div>
             </div>
 
             <div className="money-amount">
-              <label>To‘lov summasi (UZS)</label>
+              <label>To'lov summasi (UZS)</label>
               <input
                 type="text"
                 placeholder="misol: 50 000"
@@ -191,33 +220,31 @@ const Money = ({ onClose }) => {
               onClick={handleSubmit}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Yuborilmoqda..." : "To‘lovga o‘tish"}
+              {isSubmitting ? "Yuborilmoqda..." : "To'lovga o'tish"}
             </button>
           </>
         ) : (
           <div className="money-waiting">
             <div className="waiting-spinner"></div>
-            <h3>To‘lovni yakunlang</h3>
-            <p>Kartangizdan to‘lovni amalga oshiring</p>
+            <h3>To'lovni yakunlang</h3>
+            <p>Kartangizdan to'lovni amalga oshiring</p>
 
             <br />
 
-            {/* YANGI: To‘lov summasi ko‘rsatish va copy qilish */}
+            {/* To'lov summasi ko'rsatish va copy qilish */}
             <div className="payment-amount-display">
               <div className="amount-info">
-                <div className="amount-label">To‘lov summasi</div>
+                <div className="amount-label">To'lov summasi</div>
                 <div className="amount-value">{amount} UZS</div>
               </div>
               <button
                 className="copy-amount-btn"
-                onClick={() => copyToClipboard(rawAmount, "To‘lov summasi")}
+                onClick={() => copyToClipboard(rawAmount, "To'lov summasi")}
               >
                 Nusxa olish
               </button>
             </div>
-                <br />
-                
-
+            <br />
 
             {/* Karta ma'lumotlari */}
             {cardInfo && (
@@ -242,14 +269,14 @@ const Money = ({ onClose }) => {
               </div>
             )}
 
-            {/* Taymer (endigi summadan keyin) */}
+            {/* Taymer */}
             <div className="deadline timer-active">
               <span className="clock-icon">⏰</span>
               <span>Qolgan vaqt: <strong className="timer-countdown">{formatTime(timeLeft)}</strong></span>
             </div>
 
             <p className="waiting-note">
-              To‘lov holatini avtomatik tekshirib turibmiz...<br />
+              To'lov holatini avtomatik tekshirib turibmiz...<br />
               (Har 5 sekundda)
             </p>
           </div>
@@ -262,7 +289,7 @@ const Money = ({ onClose }) => {
               {resultType === "success" ? "✓" : "✖"}
             </div>
             <div className="result-text">
-              {resultType === "success" ? "To‘lov muvaffaqiyatli!" : "To‘lov bekor qilindi"}
+              {resultType === "success" ? "To'lov muvaffaqiyatli!" : "To'lov bekor qilindi"}
             </div>
           </div>
         )}
@@ -270,6 +297,18 @@ const Money = ({ onClose }) => {
 
       {/* Toast */}
       {toast && <div className="toast-notification">{toast}</div>}
+      
+      {/* To'lov o'chirilgan xabari */}
+      {showPaymentDisabled && (
+        <div className="payment-disabled-overlay">
+          <div className="payment-disabled-modal">
+            <div className="disabled-icon">🚫</div>
+            <h3>To'lov vaqtincha o'chirilgan</h3>
+            <p>Hozirda web appdan to'lov qilish imkoni yo'q.</p>
+            <p className="bot-text">📱 Bot orqali to'lov amalga oshiring</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
