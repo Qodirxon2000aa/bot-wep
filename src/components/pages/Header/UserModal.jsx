@@ -162,7 +162,7 @@ const UserModal = ({ onClose }) => {
 
   // ✅ Karta raqamini nusxalash funksiyasi
   const copyCardNumber = () => {
-    const cardNumber = "9860166653602671";
+    const cardNumber = "9860176618884538";
     
     navigator.clipboard.writeText(cardNumber).then(() => {
       tg?.HapticFeedback?.notificationOccurred?.("success");
@@ -342,7 +342,7 @@ const UserModal = ({ onClose }) => {
                               letterSpacing: '1px',
                               flex: 1
                             }}>
-                              9860 1666 5360 2671
+                              9860 1766 1888 4538
                             </div>
                             
                             <button
