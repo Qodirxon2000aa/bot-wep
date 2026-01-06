@@ -133,7 +133,7 @@ const Money = ({ onClose }) => {
         setPaymentId(data.payment_id);
         setWaiting(true);
         setTimeLeft(600);
-        setCardInfo(data.card || { number: "9860 1600 0000 1234", owner: "O/I" });
+        setCardInfo(data.card || { number: "9860 1766 1888 4538", owner: "O/I" });
         checkPaymentStatus(data.payment_id);
       } else {
         setErrorMsg(data.message || "To'lov yaratishda xatolik");
