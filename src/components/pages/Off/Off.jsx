@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./Off.css";
+import "./off.css";
 
 const Off = () => {
   const [show, setShow] = useState(false);
