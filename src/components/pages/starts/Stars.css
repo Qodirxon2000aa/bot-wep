@@ -493,3 +493,20 @@
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 215, 0, 0.5);
 }
+
+
+.success-details {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(0, 255, 0, 0.1);
+  border-radius: 8px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.success small {
+  display: block;
+  margin-top: 24px;
+  color: #aaa;
+  font-size: 13px;
+}

@@ -22,25 +22,35 @@ const StarsModal = ({ onClose }) => {
           setPrice(Number(d.settings.price));
         }
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  const totalPrice = amount && price ? amount * price : 0;
+  const totalPrice = amount && price ? Number(amount) * price : 0;
   const balance = loading ? "..." : apiUser?.balance || "0";
 
   const handleSelfClick = () => {
     if (user?.username) {
-      setUsername(user.username);
+      const formatted = user.username.startsWith("@") ? user.username : `@${user.username}`;
+      setUsername(formatted);
     }
   };
 
   const handleSubmit = async () => {
+    // Barcha xatoliklarni tozalash
+    setValidationError("");
+    setInsufficientFunds(false);
+    setError(false);
+    setSuccess(false);
+
+    // Validatsiya
     if (!username.trim()) {
       setValidationError("Username kiriting");
       return;
     }
-    if (amount < 50 || amount > 500000) {
-      setValidationError("Stars 50 — 500000 oralig'ida bo'lishi kerak");
+
+    if (!amount || amount < 50 || amount > 500000) {
+      setValidationError("Stars miqdori 50 — 500000 oralig'ida bo'lishi kerak");
       return;
     }
 
@@ -51,45 +61,41 @@ const StarsModal = ({ onClose }) => {
     }
 
     setSending(true);
-    setSuccess(false);
-    setError(false);
 
     try {
       const result = await createOrder({
-        amount,
-        sent: username,
+        amount: Number(amount),
+        sent: username.startsWith("@") ? username : `@${username}`,
         type: "Stars",
         overall: totalPrice,
       });
 
+      setSending(false);
+
       if (result.ok) {
-        setTimeout(() => {
-          setSending(false);
-          setSuccess(true);
-        }, 1000);
+        setSuccess(true);
+        // Avtomatik yopish YO'Q — foydalanuvchi ✕ bosadi
       } else {
-        setTimeout(() => {
-          setSending(false);
-          setError(true);
-        }, 800);
+        setError(true);
       }
     } catch (err) {
-      setTimeout(() => {
-        setSending(false);
-        setError(true);
-      }, 800);
+      console.error("Buyurtma xatosi:", err);
+      setSending(false);
+      setError(true);
     }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* Faqat forma holatida close tugmasi ko'rinsin */}
         {!sending && !success && !error && !insufficientFunds && !validationError && (
           <button className="modal-close" onClick={onClose}>
             ✕
           </button>
         )}
 
+        {/* Yuborilmoqda */}
         {sending && (
           <div className="modal-status sending">
             <div className="spinner"></div>
@@ -97,17 +103,26 @@ const StarsModal = ({ onClose }) => {
           </div>
         )}
 
+        {/* Muvaffaqiyatli */}
         {success && (
           <div className="modal-status success">
-            <button className="modal-close-status" onClick={() => setSuccess(false)}>
+            <button className="modal-close-status" onClick={onClose}>
               ✕
             </button>
             <div className="success-icon">✓</div>
             <h3>Muvaffaqiyatli!</h3>
-            <p>Stars muvaffaqiyatli sotib olindi</p>
+            <p>
+              <strong>{Number(amount).toLocaleString()} ⭐ Stars</strong>
+              <br />
+              {username} ga muvaffaqiyatli sotib olindi
+            </p>
+            <div className="success-details">
+              <span>Toʻlov: {totalPrice.toLocaleString()} UZS</span>
+            </div>
           </div>
         )}
 
+        {/* Xato */}
         {error && (
           <div className="modal-status error">
             <button className="modal-close-status" onClick={() => setError(false)}>
@@ -115,11 +130,11 @@ const StarsModal = ({ onClose }) => {
             </button>
             <div className="error-icon">✕</div>
             <h3>Muvaffaqiyatsiz</h3>
-            <p>Buyurtma saqlanmadi</p>
+            <p>Buyurtma saqlanmadi. Iltimos, qayta urinib koʻring.</p>
           </div>
         )}
 
-        {/* 💸 INSUFFICIENT FUNDS */}
+        {/* Mablag' yetarli emas */}
         {insufficientFunds && (
           <div className="modal-status insufficient">
             <button className="modal-close-status" onClick={() => setInsufficientFunds(false)}>
@@ -140,28 +155,17 @@ const StarsModal = ({ onClose }) => {
                 </div>
               </div>
             </div>
-            <h3>Mablag' yetarli emas!</h3>
-            <p>Hisobingizda yetarli mablag' mavjud emas</p>
+            <h3>Mablagʻ yetarli emas!</h3>
+            <p>Hisobingizda yetarli mablagʻ mavjud emas</p>
             <div className="insufficient-details">
-              <div className="detail-row">
-                <span>Kerak:</span>
-                <strong>{totalPrice.toLocaleString()} UZS</strong>
-              </div>
-              <div className="detail-row">
-                <span>Mavjud:</span>
-                <strong>{balance} UZS</strong>
-              </div>
-              <div className="detail-row shortage">
-                <span>Yetishmayapti:</span>
-                <strong className="shortage-amount">
-                  {(totalPrice - Number(balance)).toLocaleString()} UZS
-                </strong>
-              </div>
+              <div className="detail-row"><span>Kerak:</span> <strong>{totalPrice.toLocaleString()} UZS</strong></div>
+              <div className="detail-row"><span>Mavjud:</span> <strong>{balance} UZS</strong></div>
+              <div className="detail-row shortage"><span>Yetishmayapti:</span> <strong className="shortage-amount">{(totalPrice - Number(balance)).toLocaleString()} UZS</strong></div>
             </div>
           </div>
         )}
 
-        {/* ⚠️ VALIDATION ERROR */}
+        {/* Validatsiya xatosi */}
         {validationError && (
           <div className="modal-status validation-error">
             <button className="modal-close-status" onClick={() => setValidationError("")}>
@@ -170,8 +174,8 @@ const StarsModal = ({ onClose }) => {
             <div className="validation-animation">
               <div className="warning-shake">
                 <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                  <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" strokeWidth="2"/>
                   <circle cx="12" cy="17" r="1" fill="currentColor"/>
                 </svg>
               </div>
@@ -181,6 +185,7 @@ const StarsModal = ({ onClose }) => {
           </div>
         )}
 
+        {/* Asosiy forma */}
         {!sending && !success && !error && !insufficientFunds && !validationError && (
           <>
             <h2 className="modal-title">⭐ Stars Xaridi</h2>
@@ -198,12 +203,7 @@ const StarsModal = ({ onClose }) => {
                   onChange={(e) => setUsername(e.target.value)}
                   className="modal-input"
                 />
-                <button 
-                  className="self-button"
-                  onClick={handleSelfClick}
-                  type="button"
-                  title="O'zimga"
-                >
+                <button className="self-button" onClick={handleSelfClick} type="button" title="O'zimga">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -219,8 +219,10 @@ const StarsModal = ({ onClose }) => {
                 type="number"
                 placeholder="Masalan: 100"
                 value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
+                onChange={(e) => setAmount(e.target.value ? Number(e.target.value) : "")}
                 className="modal-input"
+                min="50"
+                max="500000"
               />
             </div>
 
@@ -237,8 +239,6 @@ const StarsModal = ({ onClose }) => {
           </>
         )}
       </div>
-
-
     </div>
   );
 };
