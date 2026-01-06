@@ -9,92 +9,97 @@ import Heart from "../../assets/gifts/heart.png";
 
 import Premium from "../pages/premuium/Premium.jsx";
 import StarsModal from "../pages/starts/Stars.jsx";
+import Off from "../pages/Off/Off.jsx"; // ✅ NEW
 
 import { useNavigate } from "react-router-dom";
 
-// Welcome Animation Component (o'zgarmadi, shuning uchun qoldirdim)
+// ✅ Welcome Animation Component
 const WelcomeAnimation = ({ onComplete }) => {
-  const [text, setText] = useState("");
+  const [text, setText] = React.useState("");
   const fullText = "Assalomu alaykum, xush kelibsiz!";
-  const [index, setIndex] = useState(0);
-  const [stage, setStage] = useState('fadeIn');
+  const [index, setIndex] = React.useState(0);
 
-  useEffect(() => {
-    if (stage === 'fadeIn') {
-      const timeout = setTimeout(() => setStage('typing'), 1000);
-      return () => clearTimeout(timeout);
-    }
-
-    if (stage === 'typing' && index < fullText.length) {
-      const timeout = setTimeout(() => {
+  React.useEffect(() => {
+    if (index < fullText.length) {
+      const t = setTimeout(() => {
         setText(prev => prev + fullText[index]);
         setIndex(index + 1);
       }, 70);
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(t);
+    } else {
+      const t = setTimeout(onComplete, 1200);
+      return () => clearTimeout(t);
     }
-
-    if (stage === 'typing' && index >= fullText.length) {
-      const timeout = setTimeout(() => setStage('pause'), 1500);
-      return () => clearTimeout(timeout);
-    }
-
-    if (stage === 'pause') {
-      const timeout = setTimeout(() => {
-        setStage('fadeOut');
-        setTimeout(onComplete, 1500);
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
-  }, [stage, index, onComplete]);
+  }, [index, fullText, onComplete]);
 
   return (
     <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      position: "fixed",
+      inset: 0,
+      background: "linear-gradient(135deg,#667eea,#764ba2)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
       zIndex: 10000,
-      opacity: stage === 'fadeIn' || stage === 'fadeOut' ? 0 : 1,
-      transform: stage === 'fadeOut' ? 'scale(1.1)' : 'scale(1)',
-      transition: 'opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), transform 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
-      overflow: 'hidden'
+      color: "#fff",
+      fontSize: "26px",
+      fontWeight: "600"
     }}>
-      {/* CSS animatsiyalar va qolgan qismi o'zgarmadi — oldingi kodingizdan nusxa oldim */}
-      {/* ... (oldingi WelcomeAnimation ichidagi kod to'liq qoldirilgan) ... */}
-      <h1 style={{ /* ... oldingi stillar ... */ }}>
-        {text}
-        {stage === 'typing' && <span style={{ animation: 'blink 0.7s infinite' }}>|</span>}
-      </h1>
+      {text}
+      <span style={{ marginLeft: 4, animation: "blink 1s infinite" }}>|</span>
     </div>
   );
 };
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [showAnimation, setShowAnimation] = useState(true);
 
-  // Modal states
+  const [showAnimation, setShowAnimation] = useState(true);
   const [isStarsOpen, setIsStarsOpen] = useState(false);
   const [isPremiumOpen, setIsPremiumOpen] = useState(false);
+
+  const [botStatus, setBotStatus] = useState(null); // ✅ NEW
+  const [loadingStatus, setLoadingStatus] = useState(true); // ✅ NEW
+
+  // 🔥 BOT STATUS TEKSHIRISH
+  useEffect(() => {
+    fetch("https://tezpremium.uz/webapp/settings.php")
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok && d.settings?.bot_status) {
+          setBotStatus(d.settings.bot_status);
+        } else {
+          setBotStatus("off");
+        }
+      })
+      .catch(() => setBotStatus("off"))
+      .finally(() => setLoadingStatus(false));
+  }, []);
+
+  // ⏳ Status yuklanayotgan payt
+  if (loadingStatus) {
+    return null; // yoki loader qo‘ysangiz bo‘ladi
+  }
+
+  // 🚧 AGAR BOT OFF BO‘LSA
+  if (botStatus === "off") {
+    return <Off />;
+  }
+
+  // 🎬 Welcome animatsiya
+  if (showAnimation) {
+    return <WelcomeAnimation onComplete={() => setShowAnimation(false)} />;
+  }
 
   const demoUser = { name: "John Doe", image: "/default-avatar.png" };
   const storedUser = localStorage.getItem("userData");
   const user = storedUser ? JSON.parse(storedUser) : demoUser;
 
-  if (showAnimation) {
-    return <WelcomeAnimation onComplete={() => setShowAnimation(false)} />;
-  }
-
   return (
     <div className="dashboard">
       <Header user={user} />
 
-      {/* ⭐ Muhim o'zgartirish: onOpenStarsModal props uzatildi */}
       <Reklama onOpenStarsModal={() => setIsStarsOpen(true)} />
 
       <div className="share-btn">
@@ -121,7 +126,6 @@ const Dashboard = () => {
         <span>Gifts Page</span>
       </div>
 
-      {/* Modallar */}
       {isStarsOpen && <StarsModal onClose={() => setIsStarsOpen(false)} />}
       {isPremiumOpen && <Premium onClose={() => setIsPremiumOpen(false)} />}
     </div>
