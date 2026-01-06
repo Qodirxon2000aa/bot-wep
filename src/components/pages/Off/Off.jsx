@@ -15,7 +15,7 @@ const Off = () => {
         <h1>🚧 Web App vaqtincha o‘chiq</h1>
         <p>
           Web App hozirda <b>ta’mirlanmoqda</b>.<br />
-          Iltimos, bot orqali foydalaning.
+          Iltimos,bot orqali foydalaning.
         </p>
         <span className="pulse">⏳</span>
       </div>
