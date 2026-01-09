@@ -19,7 +19,7 @@ const PremiumModal = ({ onClose }) => {
     { 
       id: 3, 
       label: "3 OYLIK", 
-      price: 165000,
+      price: 170000,
       img: image 
     },
     { 
